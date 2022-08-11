@@ -1,10 +1,7 @@
 import {EditOperation} from './EditOperation';
 
-export class Insertion implements EditOperation {
-  deleteSymbol: string;
-  insertSymbol: string;
-  index: number;
-  apply(word: String): String {
+export class Insertion extends EditOperation {
+  apply(word: string): string {
     return (
       word.slice(0, this.index) +
       this.insertSymbol +

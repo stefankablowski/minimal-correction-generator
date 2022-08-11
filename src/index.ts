@@ -1,24 +1,17 @@
-console.log('Try npm run lint/fix!');
+import {Word} from './model';
+// Words (String)
 
-const longString =
-  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer ut aliquet diam.';
+// Correction (Array<EditOperation>)
 
-const trailing = 'Semicolon';
+// Edit Operation Types:
+// - Insert
+// - Delete
+// - Replace
 
-const why = 'am I tabbed?';
+// Execute the edit operation
 
-export function doSomeStuff(
-  withThis: string,
-  andThat: string,
-  andThose: string[]
-) {
-  //function on one line
-  if (!andThose.length) {
-    return false;
-  }
-  console.log(withThis);
-  console.log(andThat);
-  console.dir(andThose);
-  return;
-}
-// TODO: more examples
+// Generate corrections of length N
+
+// function applyEditOperation(word : Word, operation : EditOperation) : Word {
+
+// }
