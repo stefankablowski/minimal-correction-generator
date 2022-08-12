@@ -2,8 +2,9 @@ import {Word} from '../Word';
 import {EditOperation} from './EditOperation';
 
 export class Correction {
-  constructor() {}
-
+  constructor(operations: EditOperation[] = []) {
+    this.operations = operations;
+  }
   operations: EditOperation[] = [];
   apply(word: Word): Word {
     return this.operations.reduce<Word>((w: Word, op: EditOperation) => {
