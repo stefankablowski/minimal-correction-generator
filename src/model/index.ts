@@ -1,2 +1,2 @@
-import {Word} from './Word';
-export {Word};
+import {Word, createWord} from './Word';
+export {Word, createWord};
