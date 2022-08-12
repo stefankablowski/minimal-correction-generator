@@ -1,6 +1,9 @@
 import {EditOperation} from './EditOperation';
 
 export class Deletion extends EditOperation {
+  constructor(deleteSymbol: string, index: number) {
+    super(deleteSymbol, '', index);
+  }
   apply(word: string): string {
     const indexOutOfRange = this.index > word.length - 1 || this.index < 0;
     if (indexOutOfRange)

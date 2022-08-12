@@ -1,6 +1,10 @@
 import {EditOperation} from './EditOperation';
 
 export class Insertion extends EditOperation {
+  constructor(insertSymbol: string, index: number) {
+    super('', insertSymbol, index);
+  }
+
   apply(word: string): string {
     const indexOutOfRange = this.index > word.length || this.index < 0;
     if (indexOutOfRange)
