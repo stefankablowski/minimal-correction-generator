@@ -32,6 +32,8 @@ function parseAndEncode(
 ) {
   const parser = cfgtool.parser;
   const encodedString = encodeStringArray(stringToParse, lexicon);
+  console.log(encodedString);
+  console.dir(JSON.stringify(grammar));
   return parser.parse(grammar, encodedString);
 }
 
@@ -52,8 +54,8 @@ function translateGrammar(grammar: Grammar, lexicon: Map<string, string>) {
         (symbol: string, i: number, arr: string[]) => {
           const symbolIsTerminal = grammar.terminals.includes(symbol);
           if (symbolIsTerminal) {
-            lexicon.get(symbol);
-            return T(symbol);
+            const encodedSymbol = lexicon.get(symbol);
+            return T(encodedSymbol);
           } else {
             return NT(symbol);
           }
@@ -118,7 +120,7 @@ describe('Context-Free Grammar', () => {
 
     const generatorFactory = cfgtool.generator;
     const generator = generatorFactory(exprGrammar);
-    console.log(generator(21));
+    // console.log(generator(21));
 
     const parser = cfgtool.parser;
     expect(
@@ -142,7 +144,7 @@ describe('Context-Free Grammar', () => {
 
     const generatorFactory = cfgtool.generator;
     const generator = generatorFactory(exprGrammar);
-    console.log(generator(21));
+    // console.log(generator(21));
 
     const parser = cfgtool.parser;
     expect(
