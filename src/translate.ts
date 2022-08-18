@@ -20,8 +20,6 @@ export function parseAndEncode(
 ) {
   const parser = cfgtool.parser;
   const encodedString = encodeStringArray(stringToParse, lexicon);
-  //   console.log(encodedString);
-  //   console.dir(JSON.stringify(grammar));
   return parser.parse(grammar, encodedString);
 }
 
@@ -89,17 +87,20 @@ export function makeid() {
   return characters[id++];
 }
 
-// Transforms an encoded string into an array of tokens
+/**
+ * Transforms an encoded string into an array of tokens
+ * @param encodedString
+ * @param lexicon
+ * @returns
+ */
 export function decodeString(
   encodedString: string,
   lexicon: Map<string, string>
 ): (string | undefined)[] {
   const reverseLexicon = new Map<string, string>();
-  //reverse lexicon
   lexicon.forEach((id: string, token: string) => {
     reverseLexicon.set(id, token);
   });
-  //   console.log(lexicon);
   return [...encodedString].map((id: string) => {
     return reverseLexicon.get(id);
   });
