@@ -1,4 +1,4 @@
-import {decodeString} from '../src/translate';
+import {decodeString} from '../src/translateGrammar';
 
 describe('Context-Free Grammar', () => {
   test('reverse', () => {

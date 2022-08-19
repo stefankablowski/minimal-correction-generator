@@ -3,7 +3,7 @@ import {
   parseAndEncode,
   cfgtool,
   decodeString,
-} from '../src/translate';
+} from '../src/translateGrammar';
 
 describe('Context-Free Grammar', () => {
   test('1(+1)*', () => {
