@@ -9,60 +9,79 @@ import {parseAndEncode, translateGrammar} from './translateGrammar';
 export function generateMinimalCorrectionsForOneWord(
   word: Word,
   correctionLeadingToWord: Correction,
-  grammar: Grammar,
-  globalMinimal: Correction[]
-) {
-  if (word.length > 6) {
-    return;
-  }
+  exprGrammar: any,
+  lexicon: Map<string, string>,
+  terminals: string[],
+  minimalCorrections: Correction[]
+): [Correction[], Correction[]] {
   const operations: EditOperation[] = generateOperationsForWord(
     word,
-    grammar.terminals
+    terminals
   );
   const wordsWithOperation: [EditOperation, Word][] = applyOperationsToWord(
     operations,
     word
   );
-  const [minimal, remaining] = checkWordProblemForWords(
+  const [localMinCorr, remainingCorrections] = checkWordProblemForWords(
     wordsWithOperation,
-    grammar
+    exprGrammar,
+    lexicon
   );
-  globalMinimal.concat(
-    minimal.map(([eop]) => {
-      const operations = [...correctionLeadingToWord.operations];
-      operations.push(eop);
-      return new Correction(operations);
-    })
+  const resultMin = localMinCorr.map(([eop, word]) =>
+    correctionLeadingToWord.extend(eop, word)
   );
-  remaining.forEach(([eop, word]) => {
-    const operations = [...correctionLeadingToWord.operations];
-    operations.push(eop);
-    const corr = new Correction(operations);
-
-    generateMinimalCorrectionsForOneWord(word, corr, grammar, globalMinimal);
-  });
+  const resultRemain = remainingCorrections.map(([eop, word]) =>
+    correctionLeadingToWord.extend(eop, word)
+  );
+  return [resultRemain, resultMin];
 }
 
-export function generateAllMinimalCorrections(word: Word, grammar: Grammar) {
-  const globalMinimal: Correction[] = [];
+export function generateAllMinimalCorrections(
+  word: Word,
+  grammar: Grammar
+): Correction[] {
+  const lexicon = new Map<string, string>();
+  const exprGrammar = translateGrammar(grammar, lexicon);
+  let minimalCorrections: Correction[] = [];
   const correctionLeadingToWord = new Correction();
-  generateMinimalCorrectionsForOneWord(
-    word,
-    correctionLeadingToWord,
-    grammar,
-    globalMinimal
-  );
-  console.log(globalMinimal);
+  correctionLeadingToWord.resultingWord = word;
+  let remainingCorrections: Correction[] = [correctionLeadingToWord];
+  let currentCorrectionsAccumulated: Correction[] = [];
+  const iterations = 2;
+
+  for (let i = 0; i < iterations; i++) {
+    for (const corr of remainingCorrections) {
+      const [currentRemainCorrections, currentMinCorrections] =
+        generateMinimalCorrectionsForOneWord(
+          corr.resultingWord,
+          corr,
+          exprGrammar,
+          lexicon,
+          grammar.terminals,
+          minimalCorrections
+        );
+      // console.log(currentCorrections);
+      currentCorrectionsAccumulated = [
+        ...currentCorrectionsAccumulated,
+        ...currentRemainCorrections,
+      ];
+      minimalCorrections = [...currentMinCorrections, ...minimalCorrections];
+    }
+    remainingCorrections = currentCorrectionsAccumulated;
+    currentCorrectionsAccumulated = [];
+  }
+
+  return minimalCorrections;
 }
 
 export function checkWordProblemForWords(
   wordsWithOperation: [EditOperation, Word][],
-  grammar: Grammar
+  exprGrammar: any,
+  lexicon: Map<string, string>
 ): [minimal: [EditOperation, Word][], remaining: [EditOperation, Word][]] {
   const minimal: [EditOperation, Word][] = [];
   const remaining: [EditOperation, Word][] = [];
-  const lexicon = new Map<string, string>();
-  const exprGrammar = translateGrammar(grammar, lexicon);
+
   wordsWithOperation.forEach(([op, word]) => {
     const parseTree = parseAndEncode(lexicon, exprGrammar, word);
     if (parseTreeContainsParses(parseTree)) {
