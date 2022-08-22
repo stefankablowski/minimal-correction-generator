@@ -53,6 +53,8 @@ export function translateGrammar(
         const symbolIsTerminal = grammar.terminals.includes(symbol);
         if (symbolIsTerminal) {
           const encodedSymbol = lexicon.get(symbol);
+          if (encodedSymbol === undefined)
+            throw Error(`No ID for symbol ${symbol} found in lexicon`);
           return T(encodedSymbol);
         } else {
           return NT(symbol);
@@ -82,6 +84,9 @@ export function encodeTerminals(
 
 let id = 0;
 export function makeid() {
+  if (id > 63) {
+    throw new RangeError('Cannot Encode more than 63 Terminals');
+  }
   const characters =
     'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   return characters[id++];
