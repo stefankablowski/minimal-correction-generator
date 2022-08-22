@@ -6,40 +6,69 @@ import {EditOperation} from './model/EditOperation/EditOperation';
 import {Grammar} from './model/Grammar';
 import {parseAndEncode, translateGrammar} from './translateGrammar';
 
-export function generateAllMinimalCorrections(word: Word, grammar: Grammar) {
-  // compute all corrections of length 1
+export function generateMinimalCorrectionsForOneWord(
+  word: Word,
+  correctionLeadingToWord: Correction,
+  grammar: Grammar,
+  globalMinimal: Correction[]
+) {
+  if (word.length > 6) {
+    return;
+  }
   const operations: EditOperation[] = generateOperationsForWord(
     word,
     grammar.terminals
   );
-  // apply these corrections to the word
-  const words: Word[] = applyOperationsToWord(operations, word);
-  // remove all corrections where w e L and save them in minimal correction set
-  const [minimal, remaining] = checkWordProblemForWords(words, grammar);
+  const wordsWithOperation: [EditOperation, Word][] = applyOperationsToWord(
+    operations,
+    word
+  );
+  const [minimal, remaining] = checkWordProblemForWords(
+    wordsWithOperation,
+    grammar
+  );
+  globalMinimal.concat(
+    minimal.map(([eop]) => {
+      const operations = [...correctionLeadingToWord.operations];
+      operations.push(eop);
+      return new Correction(operations);
+    })
+  );
+  remaining.forEach(([eop, word]) => {
+    const operations = [...correctionLeadingToWord.operations];
+    operations.push(eop);
+    const corr = new Correction(operations);
 
-  // extend remaining corrections by all possible edit operations each
-  let previousRemainingFixPoint = 0;
-  let currentRemainingFixPoint = remaining.length;
-  while (previousRemainingFixPoint < currentRemainingFixPoint) {
-    previousRemainingFixPoint = currentRemainingFixPoint;
-    currentRemainingFixPoint = remaining.length;
-  }
+    generateMinimalCorrectionsForOneWord(word, corr, grammar, globalMinimal);
+  });
+}
+
+export function generateAllMinimalCorrections(word: Word, grammar: Grammar) {
+  const globalMinimal: Correction[] = [];
+  const correctionLeadingToWord = new Correction();
+  generateMinimalCorrectionsForOneWord(
+    word,
+    correctionLeadingToWord,
+    grammar,
+    globalMinimal
+  );
+  console.log(globalMinimal);
 }
 
 export function checkWordProblemForWords(
-  words: Word[],
+  wordsWithOperation: [EditOperation, Word][],
   grammar: Grammar
-): [minimal: Word[], remaining: Word[]] {
-  const minimal: Word[] = [];
-  const remaining: Word[] = [];
+): [minimal: [EditOperation, Word][], remaining: [EditOperation, Word][]] {
+  const minimal: [EditOperation, Word][] = [];
+  const remaining: [EditOperation, Word][] = [];
   const lexicon = new Map<string, string>();
   const exprGrammar = translateGrammar(grammar, lexicon);
-  words.forEach(word => {
+  wordsWithOperation.forEach(([op, word]) => {
     const parseTree = parseAndEncode(lexicon, exprGrammar, word);
     if (parseTreeContainsParses(parseTree)) {
-      minimal.push(word);
+      minimal.push([op, word]);
     } else {
-      remaining.push(word);
+      remaining.push([op, word]);
     }
   });
   return [minimal, remaining];
@@ -67,8 +96,8 @@ export function generateOperationsForWord(
 export function applyOperationsToWord(
   operations: EditOperation[],
   word: Word
-): Word[] {
-  return operations.map(op => op.apply(word));
+): [EditOperation, Word][] {
+  return operations.map(op => [op, op.apply(word)]);
 }
 
 export function sortOperationsByType(

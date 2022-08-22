@@ -4,6 +4,7 @@ import {
   applyOperationsToWord,
   sortOperationsByType,
   checkWordProblemForWords,
+  generateAllMinimalCorrections,
 } from '../src/generateCorrections';
 import {Correction} from '../src/model/EditOperation/Correction';
 import {EditOperation} from '../src/model/EditOperation/EditOperation';
@@ -234,16 +235,8 @@ test('Apple-Banana-Grammar', () => {
     word,
     grammar.terminals
   );
+
   expect(sortOperationsByType(operations)).toMatchObject([
-    // {deleteSymbol: '', insertSymbol: 'Banana', index: 0},
-    // {deleteSymbol: '', insertSymbol: 'Apple', index: 0},
-    // {deleteSymbol: '', insertSymbol: '+', index: 0},
-    // {deleteSymbol: '', insertSymbol: 'Banana', index: 1},
-    // {deleteSymbol: '', insertSymbol: 'Apple', index: 1},
-    // {deleteSymbol: '', insertSymbol: '+', index: 1},
-    // {deleteSymbol: '', insertSymbol: 'Banana', index: 2},
-    // {deleteSymbol: '', insertSymbol: 'Apple', index: 2},
-    // {deleteSymbol: '', insertSymbol: '+', index: 2},
     {
       deleteSymbol: 'Banana',
       insertSymbol: 'Apple',
@@ -262,16 +255,14 @@ test('Apple-Banana-Grammar', () => {
     {deleteSymbol: '+', insertSymbol: '', index: 1},
     {deleteSymbol: 'Apple', insertSymbol: '', index: 2},
   ]);
-  console.log(sortOperationsByType(operations));
-  // operations.forEach(op =>
-  //   console.log(
-  //     op instanceof Insertion ||
-  //       op instanceof Deletion ||
-  //       op instanceof Replacement
-  //   )
-  // );
-  const words: Word[] = applyOperationsToWord(operations, word);
+
+  const words: [EditOperation, Word][] = applyOperationsToWord(
+    operations,
+    word
+  );
   const [minimal, remaining] = checkWordProblemForWords(words, grammar);
+
+  generateAllMinimalCorrections(word, grammar);
   console.log(minimal);
   console.log('---');
   console.log(remaining);
