@@ -256,14 +256,10 @@ test('Apple-Banana-Grammar', () => {
     {deleteSymbol: 'Apple', insertSymbol: '', index: 2},
   ]);
 
+  //TODO Write Test
   const words: [EditOperation, Word][] = applyOperationsToWord(
     operations,
     word
   );
-  const [minimal, remaining] = checkWordProblemForWords(words, grammar);
-
-  generateAllMinimalCorrections(word, grammar);
-  console.log(minimal);
-  console.log('---');
-  console.log(remaining);
+  console.log(generateAllMinimalCorrections(word, grammar));
 });

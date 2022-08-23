@@ -39,7 +39,7 @@ describe('Context-Free Grammar', () => {
 
     const generatorFactory = cfgtool.generator;
     const generator = generatorFactory(exprGrammar);
-    console.log(decodeString(generator(13), lexicon));
+    // console.log(decodeString(generator(13), lexicon));
 
     expect(
       parseAndEncode(lexicon, exprGrammar, [
@@ -235,8 +235,8 @@ describe('Context-Free Grammar', () => {
     const generator = generatorFactory(exprGrammar);
     for (let index = 0; index < 30; index++) {
       const generatedString = generator(index);
-      if (generatedString)
-        console.log(decodeString(generatedString, lexicon).join(' '));
+      // if (generatedString)
+      // console.log(decodeString(generatedString, lexicon).join(' '));
     }
 
     // expect(

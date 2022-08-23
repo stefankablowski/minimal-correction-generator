@@ -11,8 +11,7 @@ export function generateMinimalCorrectionsForOneWord(
   correctionLeadingToWord: Correction,
   exprGrammar: any,
   lexicon: Map<string, string>,
-  terminals: string[],
-  minimalCorrections: Correction[]
+  terminals: string[]
 ): [Correction[], Correction[]] {
   const operations: EditOperation[] = generateOperationsForWord(
     word,
@@ -46,8 +45,8 @@ export function generateAllMinimalCorrections(
   const correctionLeadingToWord = new Correction();
   correctionLeadingToWord.resultingWord = word;
   let remainingCorrections: Correction[] = [correctionLeadingToWord];
-  let currentCorrectionsAccumulated: Correction[] = [];
-  const iterations = 2;
+  let remainingCorrectionsForNextIteration: Correction[] = [];
+  const iterations = 5;
 
   for (let i = 0; i < iterations; i++) {
     for (const corr of remainingCorrections) {
@@ -57,18 +56,16 @@ export function generateAllMinimalCorrections(
           corr,
           exprGrammar,
           lexicon,
-          grammar.terminals,
-          minimalCorrections
+          grammar.terminals
         );
-      // console.log(currentCorrections);
-      currentCorrectionsAccumulated = [
-        ...currentCorrectionsAccumulated,
+      remainingCorrectionsForNextIteration = [
+        ...remainingCorrectionsForNextIteration,
         ...currentRemainCorrections,
       ];
       minimalCorrections = [...currentMinCorrections, ...minimalCorrections];
     }
-    remainingCorrections = currentCorrectionsAccumulated;
-    currentCorrectionsAccumulated = [];
+    remainingCorrections = remainingCorrectionsForNextIteration;
+    remainingCorrectionsForNextIteration = [];
   }
 
   return minimalCorrections;
@@ -93,6 +90,7 @@ export function checkWordProblemForWords(
   return [minimal, remaining];
 }
 
+//TODO dont replace already replaced character
 export function generateOperationsForWord(
   word: Word,
   alphabet: Alphabet
