@@ -3,6 +3,7 @@ import {Alphabet} from './model/Alphabet';
 import {Deletion, Insertion, Replacement} from './model/EditOperation';
 import {Correction} from './model/EditOperation/Correction';
 import {EditOperation} from './model/EditOperation/EditOperation';
+import {EmptyOperation} from './model/EditOperation/EmptyOperation';
 import {Grammar} from './model/Grammar';
 import {parseAndEncode, translateGrammar} from './translateGrammar';
 
@@ -10,7 +11,8 @@ export function generateMinimalCorrectionsForOneWord(
   correctionLeadingToWord: Correction,
   exprGrammar: any,
   lexicon: Map<string, string>,
-  terminals: string[]
+  terminals: string[],
+  checkEmptyEditOperation: boolean
 ): [Correction[], Correction[]] {
   const {resultingWord: word, consumedIndices} = correctionLeadingToWord;
 
@@ -19,10 +21,16 @@ export function generateMinimalCorrectionsForOneWord(
     consumedIndices,
     terminals
   );
+
+  if (checkEmptyEditOperation) {
+    operations.push(new EmptyOperation());
+  }
+
   const wordsWithOperation: [EditOperation, Word][] = applyOperationsToWord(
     operations,
     word
   );
+
   const [localMinCorr, remainingCorrections] = checkWordProblemForWords(
     wordsWithOperation,
     exprGrammar,
@@ -53,6 +61,7 @@ export function generateAllMinimalCorrections(
   let remainingCorrections: Correction[] = [correctionLeadingToWord];
   let remainingCorrectionsForNextIteration: Correction[] = [];
   const iterations = 5;
+  let checkEmptyEditOperation = true;
 
   //TODO: Better termination condition (no new corrections to be found)
   for (let i = 0; i < iterations; i++) {
@@ -62,8 +71,10 @@ export function generateAllMinimalCorrections(
           corr,
           exprGrammar,
           lexicon,
-          grammar.terminals
+          grammar.terminals,
+          checkEmptyEditOperation
         );
+      checkEmptyEditOperation = false;
       remainingCorrectionsForNextIteration = [
         ...remainingCorrectionsForNextIteration,
         ...currentRemainCorrections,

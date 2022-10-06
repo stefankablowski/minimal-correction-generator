@@ -965,7 +965,7 @@ describe('generateBioGrammar', () => {
     for (let index = 0; index < 30; index++) {
       const generatedString = generator(index);
       if (generatedString) {
-        console.log(decodeString(generatedString, lexicon).join(','));
+        // console.log(decodeString(generatedString, lexicon).join(','));
       }
     }
   });
