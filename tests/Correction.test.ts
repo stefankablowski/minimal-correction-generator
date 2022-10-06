@@ -50,7 +50,10 @@ describe('Corrections', () => {
       new Deletion('w', 0),
     ];
     const correction: Correction = new Correction(operations);
-    const extended = correction.extend(new Insertion('n', 0), createWord('n'));
+    const extended = correction.extendByOperation(
+      new Insertion('n', 0),
+      createWord('n')
+    );
     operations.push(new Insertion('n', 0));
     correction.resultingWord = createWord('n');
 

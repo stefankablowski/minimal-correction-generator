@@ -7,14 +7,16 @@ import {Grammar} from './model/Grammar';
 import {parseAndEncode, translateGrammar} from './translateGrammar';
 
 export function generateMinimalCorrectionsForOneWord(
-  word: Word,
   correctionLeadingToWord: Correction,
   exprGrammar: any,
   lexicon: Map<string, string>,
   terminals: string[]
 ): [Correction[], Correction[]] {
+  const {resultingWord: word, consumedIndices} = correctionLeadingToWord;
+
   const operations: EditOperation[] = generateOperationsForWord(
     word,
+    consumedIndices,
     terminals
   );
   const wordsWithOperation: [EditOperation, Word][] = applyOperationsToWord(
@@ -27,10 +29,10 @@ export function generateMinimalCorrectionsForOneWord(
     lexicon
   );
   const resultMin = localMinCorr.map(([eop, word]) =>
-    correctionLeadingToWord.extend(eop, word)
+    correctionLeadingToWord.extendByOperation(eop, word)
   );
   const resultRemain = remainingCorrections.map(([eop, word]) =>
-    correctionLeadingToWord.extend(eop, word)
+    correctionLeadingToWord.extendByOperation(eop, word)
   );
   return [resultRemain, resultMin];
 }
@@ -44,15 +46,19 @@ export function generateAllMinimalCorrections(
   let minimalCorrections: Correction[] = [];
   const correctionLeadingToWord = new Correction();
   correctionLeadingToWord.resultingWord = word;
+  correctionLeadingToWord.consumedIndices = Array.from(
+    {length: word.length},
+    () => false
+  );
   let remainingCorrections: Correction[] = [correctionLeadingToWord];
   let remainingCorrectionsForNextIteration: Correction[] = [];
   const iterations = 5;
 
+  //TODO: Better termination condition (no new corrections to be found)
   for (let i = 0; i < iterations; i++) {
     for (const corr of remainingCorrections) {
       const [currentRemainCorrections, currentMinCorrections] =
         generateMinimalCorrectionsForOneWord(
-          corr.resultingWord,
           corr,
           exprGrammar,
           lexicon,
@@ -90,26 +96,38 @@ export function checkWordProblemForWords(
   return [minimal, remaining];
 }
 
-//TODO dont replace already replaced character
+/**
+ * Generate deletion and replacement operations on all possible indices of the given word
+ * @param word
+ * @param alphabet
+ * @returns
+ */
 export function generateOperationsForWord(
   word: Word,
+  consumedIndices: boolean[],
   alphabet: Alphabet
 ): EditOperation[] {
   const operations: EditOperation[] = [];
 
   for (let index = 0; index < word.length; index++) {
-    const currentToken = word[index];
-    operations.push(new Deletion(currentToken, index));
-    for (const symb of alphabet) {
-      // operations.push(new Insertion(symb, index));
-      if (symb !== currentToken) {
-        operations.push(new Replacement(currentToken, symb, index));
+    if (!consumedIndices[index]) {
+      const currentSymbol = word[index];
+      operations.push(new Deletion(currentSymbol, index));
+      for (const symb of alphabet) {
+        // operations.push(new Insertion(symb, index));
+        if (symb !== currentSymbol) {
+          operations.push(new Replacement(currentSymbol, symb, index));
+        }
       }
     }
   }
   return operations;
 }
 
+/**
+ * Generate
+ * @returns a pair of the operation and the result of its application on the word
+ */
 export function applyOperationsToWord(
   operations: EditOperation[],
   word: Word

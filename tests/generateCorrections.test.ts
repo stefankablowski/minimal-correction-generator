@@ -233,6 +233,7 @@ test('Apple-Banana-Grammar', () => {
   const word = ['Banana', '+', 'Apple'];
   const operations: EditOperation[] = generateOperationsForWord(
     word,
+    [false, false, false],
     grammar.terminals
   );
 
