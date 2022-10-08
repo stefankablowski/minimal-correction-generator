@@ -10,6 +10,7 @@ export class Correction {
     this.resultingWord = [];
     this.consumedIndices = [];
   }
+
   operations: EditOperation[] = [];
   apply(word: Word): Word {
     return this.operations.reduce<Word>((w: Word, op: EditOperation) => {
@@ -18,12 +19,20 @@ export class Correction {
   }
   resultingWord: Word;
   consumedIndices: boolean[];
+  // transition between deletions and replacements, index of 1st replacement
+  transitionIndex = Correction.T_INDEX_DEFAULT;
+  static T_INDEX_DEFAULT = -1;
 
   //TODO
   simplify(): Correction {
     throw Error('Simplify not implemented yet');
   }
-  extendByOperation(eop: EditOperation, resultingWord: Word): Correction {
+
+  extendByOperation(
+    eop: EditOperation,
+    resultingWord: Word,
+    canonical = false
+  ): Correction {
     const newCorrection = new Correction([...this.operations].concat(eop));
     newCorrection.resultingWord = resultingWord;
     newCorrection.consumedIndices = this.consumedIndices;
@@ -37,6 +46,10 @@ export class Correction {
     if (eop instanceof Replacement) {
       newCorrection.consumedIndices = [...this.consumedIndices];
       newCorrection.consumedIndices[eop.index] = true;
+      if (canonical) {
+        newCorrection.transitionIndex =
+          newCorrection.consumedIndices.length - 1;
+      }
     }
     return newCorrection;
   }

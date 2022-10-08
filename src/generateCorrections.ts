@@ -12,14 +12,17 @@ export function generateMinimalCorrectionsForOneWord(
   exprGrammar: any,
   lexicon: Map<string, string>,
   terminals: string[],
-  checkEmptyEditOperation: boolean
+  checkEmptyEditOperation: boolean,
+  canonical: boolean
 ): [Correction[], Correction[]] {
   const {resultingWord: word, consumedIndices} = correctionLeadingToWord;
 
   const operations: EditOperation[] = generateOperationsForWord(
     word,
     consumedIndices,
-    terminals
+    terminals,
+    canonical,
+    correctionLeadingToWord.transitionIndex
   );
 
   if (checkEmptyEditOperation) {
@@ -37,17 +40,18 @@ export function generateMinimalCorrectionsForOneWord(
     lexicon
   );
   const resultMin = localMinCorr.map(([eop, word]) =>
-    correctionLeadingToWord.extendByOperation(eop, word)
+    correctionLeadingToWord.extendByOperation(eop, word, canonical)
   );
   const resultRemain = remainingCorrections.map(([eop, word]) =>
-    correctionLeadingToWord.extendByOperation(eop, word)
+    correctionLeadingToWord.extendByOperation(eop, word, canonical)
   );
   return [resultRemain, resultMin];
 }
 
 export function generateAllMinimalCorrections(
   word: Word,
-  grammar: Grammar
+  grammar: Grammar,
+  canonical = false
 ): Correction[] {
   const lexicon = new Map<string, string>();
   const exprGrammar = translateGrammar(grammar, lexicon);
@@ -72,7 +76,8 @@ export function generateAllMinimalCorrections(
           exprGrammar,
           lexicon,
           grammar.terminals,
-          checkEmptyEditOperation
+          checkEmptyEditOperation,
+          canonical
         );
       checkEmptyEditOperation = false;
       remainingCorrectionsForNextIteration = [
@@ -116,14 +121,18 @@ export function checkWordProblemForWords(
 export function generateOperationsForWord(
   word: Word,
   consumedIndices: boolean[],
-  alphabet: Alphabet
+  alphabet: Alphabet,
+  canonical = false,
+  transitionIndex = Correction.T_INDEX_DEFAULT
 ): EditOperation[] {
   const operations: EditOperation[] = [];
 
   for (let index = 0; index < word.length; index++) {
     if (!consumedIndices[index]) {
       const currentSymbol = word[index];
-      operations.push(new Deletion(currentSymbol, index));
+      if (transitionIndex < 0) {
+        operations.push(new Deletion(currentSymbol, index));
+      }
       for (const symb of alphabet) {
         // operations.push(new Insertion(symb, index));
         if (symb !== currentSymbol) {
