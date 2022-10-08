@@ -1,5 +1,6 @@
 import {Word, createWord} from '../src/model';
 import {Deletion, Insertion, Replacement} from '../src/model/EditOperation';
+import {EmptyOperation} from '../src/model/EditOperation/EmptyOperation';
 
 describe('Edit Operations', () => {
   test('Insertion', () => {
@@ -90,5 +91,21 @@ describe('Edit Operations', () => {
       'affects',
       'Yeast',
     ]);
+  });
+  test('Comparison', () => {
+    const ins1 = new Insertion('w', 2);
+    const ins2 = new Insertion('w', 2);
+
+    expect(ins1.equals(ins2)).toBe(true);
+
+    const ins3 = new Insertion('w', 3);
+    expect(ins1.equals(ins3)).toBe(false);
+
+    const ins4 = new Deletion('w', 2);
+    expect(ins1.equals(ins4)).toBe(false);
+
+    const empty1 = new EmptyOperation();
+    const empty2 = new EmptyOperation();
+    expect(empty1.equals(empty2)).toBe(true);
   });
 });

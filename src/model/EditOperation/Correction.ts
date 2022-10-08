@@ -3,12 +3,17 @@ import {Deletion} from './Deletion';
 import {EditOperation} from './EditOperation';
 import {Replacement} from './Replacement';
 
-export class Correction {
+export class Correction implements Comparable<Correction> {
   constructor(operations: EditOperation[] = []) {
     this.operations = operations;
     // word that this correction leads to, when applied to the input word
     this.resultingWord = [];
     this.consumedIndices = [];
+  }
+  equals(value: Correction): boolean {
+    return this.operations.every((operation, index) =>
+      operation.equals(value.operations[index])
+    );
   }
 
   operations: EditOperation[] = [];

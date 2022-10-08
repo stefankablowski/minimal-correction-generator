@@ -59,4 +59,23 @@ describe('Corrections', () => {
 
     expect(extended).toStrictEqual(correction);
   });
+  test('Comparable', () => {
+    const c1 = new Correction([
+      new Deletion('n', 0),
+      new Deletion('e', 0),
+      new Deletion('w', 0),
+    ]);
+    const c2 = new Correction([
+      new Deletion('n', 0),
+      new Deletion('e', 0),
+      new Deletion('w', 0),
+    ]);
+    expect(c1.equals(c2)).toBe(true);
+    const c3 = new Correction([
+      new Insertion('n', 0),
+      new Deletion('e', 0),
+      new Deletion('w', 0),
+    ]);
+    expect(c1.equals(c3)).toBe(false);
+  });
 });
