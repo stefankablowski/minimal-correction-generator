@@ -30,7 +30,28 @@ export class Correction implements Comparable<Correction> {
 
   //TODO
   simplify(): Correction {
-    throw Error('Simplify not implemented yet');
+    const newOperations: EditOperation[] = [...this.operations];
+    for (const {
+      value: [current, next],
+      index,
+    } of this.iteratePairwise()) {
+      const simplifiedPair = EditOperation.simplifyPair(current, next);
+      if (simplifiedPair.length === 1) {
+        const [simplificationResult] = simplifiedPair;
+        newOperations.splice(index, 2, simplificationResult);
+      } else if (simplifiedPair.length === 0) {
+        newOperations.splice(index, 2);
+      }
+    }
+    return new Correction(newOperations);
+  }
+
+  *iteratePairwise() {
+    for (let index = 0; index < this.operations.length - 1; index++) {
+      const currentOperation = this.operations[index];
+      const nextOperation = this.operations[index + 1];
+      yield {value: [currentOperation, nextOperation], index};
+    }
   }
 
   extendByOperation(

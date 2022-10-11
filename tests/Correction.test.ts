@@ -78,4 +78,25 @@ describe('Corrections', () => {
     ]);
     expect(c1.equals(c3)).toBe(false);
   });
+  test('Not Simplifiable', () => {
+    const c1 = new Correction([
+      new Deletion('n', 0),
+      new Deletion('e', 0),
+      new Deletion('w', 0),
+    ]);
+    const c2 = new Correction([
+      new Deletion('n', 0),
+      new Deletion('e', 0),
+      new Deletion('w', 0),
+    ]);
+
+    expect(c1.simplify().equals(c2)).toBe(true);
+  });
+  test('Simplifiable to empty ()', () => {
+    const c1 = new Correction([new Insertion('n', 0), new Deletion('n', 0)]);
+    const c2 = c1.simplify();
+    const c3 = new Correction([]);
+    expect(c2).toEqual(c3);
+    expect(c2.equals(c3)).toBe(true);
+  });
 });
