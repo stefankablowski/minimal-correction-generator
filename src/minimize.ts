@@ -1,6 +1,9 @@
 import {EditOperation, Correction} from './model/EditOperation';
 
-export function minimize(corr: Correction): boolean {
+export function minimizable(
+  corr: Correction,
+  foundMinimization?: Correction
+): boolean {
   const {operations, transitionIndex} = corr;
   const deletions = corr.operations.slice(0, transitionIndex);
   // propagate each deletion to the right and compare with each replacement
@@ -12,7 +15,6 @@ export function minimize(corr: Correction): boolean {
         transitionIndex - 1,
         corr
       );
-      console.log(propagated);
       for (
         let replIndex = transitionIndex;
         replIndex < operations.length;
@@ -22,13 +24,27 @@ export function minimize(corr: Correction): boolean {
           propagated[transitionIndex - 1],
           operations[replIndex],
         ];
-        const simplifiable =
-          EditOperation.simplifyPair(...transitionPair).length === 1;
-        if (simplifiable) return true;
+        const simplification = EditOperation.simplifyPair(...transitionPair);
+        if (simplification.length === 1) {
+          if (foundMinimization !== undefined) {
+            propagated.splice(transitionIndex - 1, 1, ...simplification);
+            propagated.splice(replIndex, 1);
+            foundMinimization.operations = propagated;
+          }
+          return true;
+        }
       }
       return false;
     })
   );
+}
+
+export function minimize(corr: Correction): Correction | undefined {
+  const minimzedCorrection: Correction = new Correction();
+  minimizable(corr, minimzedCorrection);
+  return minimzedCorrection.operations.length !== 0
+    ? minimzedCorrection
+    : undefined;
 }
 
 /**
