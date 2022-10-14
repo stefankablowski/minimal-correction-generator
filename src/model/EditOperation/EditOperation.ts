@@ -63,8 +63,43 @@ export abstract class EditOperation implements Comparable<EditOperation> {
       return [new Insertion(op2.insertSymbol, op2.index)];
     }
     /* Extended Simplifying */
+    // (ii)
+    if (
+      op1.index === op2.index &&
+      op1.isDeletion() &&
+      op2.isReplacement() &&
+      op1.deleteSymbol === op2.insertSymbol
+    ) {
+      return [new Deletion(op2.deleteSymbol, op1.index + 1)];
+    }
+    // (iv)
+    if (
+      op1.index - 1 === op2.index &&
+      op1.isDeletion() &&
+      op2.isReplacement() &&
+      op1.deleteSymbol === op2.insertSymbol
+    ) {
+      return [new Deletion(op2.deleteSymbol, op2.index)];
+    }
 
     return [op1, op2];
+  }
+
+  static swapPair(
+    op1: EditOperation,
+    op2: EditOperation
+  ): [EditOperation, EditOperation] | undefined {
+    if (op1.isReplacement() && op2.isReplacement() && op1.index !== op2.index) {
+      return [op2, op1];
+    }
+    if (op1.isDeletion() && op2.isDeletion()) {
+      if (op1.index > op2.index) {
+        return [op2, new Deletion(op1.deleteSymbol, op1.index - 1)];
+      } else {
+        return [new Deletion(op2.deleteSymbol, op2.index + 1), op1];
+      }
+    }
+    return undefined;
   }
 
   isInsertion() {

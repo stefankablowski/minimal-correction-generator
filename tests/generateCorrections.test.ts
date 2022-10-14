@@ -265,7 +265,16 @@ test('Apple-Banana-Grammar', () => {
 
   const minCorrections: Correction[] = generateAllMinimalCorrections(
     word,
-    grammar
+    grammar,
+    true
   );
-  minCorrections.forEach(c => console.log(c));
+  //printMinCorrections(minCorrections);
+  console.log(minCorrections.length);
 });
+function printMinCorrections(minCorrections: Correction[]) {
+  minCorrections.forEach(c =>
+    console.log(
+      `${JSON.stringify(c.operations)}, resultingword: ${c.resultingWord}`
+    )
+  );
+}
