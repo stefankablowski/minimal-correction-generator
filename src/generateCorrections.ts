@@ -132,7 +132,10 @@ export function generateOperationsForWord(
   for (let index = 0; index < word.length; index++) {
     if (!consumedIndices[index]) {
       const currentSymbol = word[index];
-      if (transitionIndex === Correction.T_INDEX_DEFAULT) {
+      if (
+        (canonical && transitionIndex === Correction.T_INDEX_DEFAULT) ||
+        !canonical
+      ) {
         operations.push(new Deletion(currentSymbol, index));
       }
       for (const symb of alphabet) {

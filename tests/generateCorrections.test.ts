@@ -268,15 +268,13 @@ test('Apple-Banana-Grammar', () => {
     grammar,
     true
   );
-  // printMinCorrections(minCorrections);
+  printMinCorrections(minCorrections);
   console.log(minCorrections.length);
 });
 function printMinCorrections(minCorrections: Correction[]) {
-  minCorrections.forEach(
-    c => console.log(`${c}`)
-
-    // console.log(
-    //   `${JSON.stringify(c.operations)}, resultingword: ${c.resultingWord}`
-    // )
-  );
+  const str = minCorrections.join('\n');
+  console.log(str);
+  // console.log(
+  //   `${JSON.stringify(c.operations)}, resultingword: ${c.resultingWord}`
+  // )
 }
