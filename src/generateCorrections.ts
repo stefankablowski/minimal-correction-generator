@@ -21,8 +21,8 @@ export function generateMinimalCorrectionsForOneWord(
     word,
     consumedIndices,
     terminals,
-    canonical,
-    correctionLeadingToWord.transitionIndex
+    correctionLeadingToWord.transitionIndex,
+    canonical
   );
 
   if (checkEmptyEditOperation) {
@@ -116,21 +116,23 @@ export function checkWordProblemForWords(
  * Generate deletion and replacement operations on all possible indices of the given word
  * @param word
  * @param alphabet
+ * @param transitionIndex of the correction leading to the word
+ * @param canonical
  * @returns
  */
 export function generateOperationsForWord(
   word: Word,
   consumedIndices: boolean[],
   alphabet: Alphabet,
-  canonical = false,
-  transitionIndex = Correction.T_INDEX_DEFAULT
+  transitionIndex = Correction.T_INDEX_DEFAULT,
+  canonical = false
 ): EditOperation[] {
   const operations: EditOperation[] = [];
 
   for (let index = 0; index < word.length; index++) {
     if (!consumedIndices[index]) {
       const currentSymbol = word[index];
-      if (transitionIndex < 0) {
+      if (transitionIndex === Correction.T_INDEX_DEFAULT) {
         operations.push(new Deletion(currentSymbol, index));
       }
       for (const symb of alphabet) {
