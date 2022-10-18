@@ -18,4 +18,13 @@ export class Replacement extends EditOperation {
       .concat(this.insertSymbol)
       .concat(word.slice(this.index + 1, word.length));
   }
+
+  toString(): string {
+    return EditOperation.print(
+      this.deleteSymbol,
+      '⇅ ',
+      this.index,
+      this.insertSymbol
+    );
+  }
 }

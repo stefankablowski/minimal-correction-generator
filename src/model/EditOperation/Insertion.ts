@@ -15,4 +15,8 @@ export class Insertion extends EditOperation {
       .concat(this.insertSymbol)
       .concat(word.slice(this.index, word.length));
   }
+
+  toString(): string {
+    return EditOperation.print(this.insertSymbol, '⬆', this.index);
+  }
 }

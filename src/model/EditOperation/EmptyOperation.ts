@@ -9,4 +9,8 @@ export class EmptyOperation extends EditOperation {
   apply(word: Word): Word {
     return word;
   }
+
+  toString(): string {
+    return '⍷';
+  }
 }

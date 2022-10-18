@@ -20,4 +20,8 @@ export class Deletion extends EditOperation {
       .slice(0, this.index)
       .concat(word.slice(this.index + 1, word.length));
   }
+
+  toString(): string {
+    return EditOperation.print(this.deleteSymbol, '⬇', this.index);
+  }
 }

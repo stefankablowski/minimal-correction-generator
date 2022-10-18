@@ -103,4 +103,8 @@ export class Correction implements Comparable<Correction> {
     }
     return newCorrection;
   }
+
+  public toString(): string {
+    return this.operations.join();
+  }
 }

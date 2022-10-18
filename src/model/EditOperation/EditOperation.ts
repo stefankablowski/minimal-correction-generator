@@ -11,6 +11,16 @@ export abstract class EditOperation implements Comparable<EditOperation> {
   insertSymbol: string;
   index: number;
   abstract apply(word: Word): Word;
+  abstract toString(): string;
+
+  static print(
+    firstSymbol: string,
+    icon: string,
+    index: number,
+    secondSymbol = ''
+  ): string {
+    return `${icon}${firstSymbol}(${index})${secondSymbol}`;
+  }
 
   equals(value: EditOperation): boolean {
     return (
