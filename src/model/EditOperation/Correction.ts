@@ -8,8 +8,8 @@ export class Correction implements Comparable<Correction> {
   resultingWord: Word;
   consumedIndices: boolean[];
   // transition between deletions and replacements, index of 1st replacement
-  transitionIndex = Correction.T_INDEX_DEFAULT;
-  static T_INDEX_DEFAULT = -1;
+  transitionIndex = Correction.TR_INDEX_DEFAULT;
+  static TR_INDEX_DEFAULT = -1;
 
   constructor(operations: EditOperation[] = [], transitionIndex = -1) {
     this.operations = operations;
@@ -101,7 +101,9 @@ export class Correction implements Comparable<Correction> {
       newCorrection.consumedIndices[eop.index] = true;
       if (canonical) {
         newCorrection.transitionIndex =
-          newCorrection.consumedIndices.length - 1;
+          newCorrection.transitionIndex === Correction.TR_INDEX_DEFAULT
+            ? this.operations.length
+            : newCorrection.transitionIndex;
       }
     }
     return newCorrection;
