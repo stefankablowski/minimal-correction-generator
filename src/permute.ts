@@ -1,14 +1,21 @@
-function permute(
-  arr: any[],
+import {PermutationObject} from './PermutationObject';
+
+function permute<T>(
+  arr: PermutationObject<T>,
+  N: number,
   swapFunction:
-    | ((index1: any, index2: any, oldArray: any[]) => any)
+    | ((index1: number, index2: number, oldArray: PermutationObject<T>) => T)
     | undefined = undefined
 ) {
-  const N = arr.length;
+  if (Array.isArray(arr)) {
+    N = arr.length;
+  } else {
+    if (N === undefined) throw new Error('');
+  }
   const directions: number[] = [];
   const indices: number[] = [];
-  let swapIndex1: any;
-  let swapIndex2: any;
+  let swapIndex1: number;
+  let swapIndex2: number;
 
   directions.push(0);
   indices.push(0);
@@ -36,8 +43,10 @@ function permute(
       return newArr;
     }
     const res = [];
-    for (let i = 0; i < N; i += 1) {
-      res.push(arr[indices[i]]);
+    if (Array.isArray(arr)) {
+      for (let i = 0; i < N; i += 1) {
+        res.push(arr[indices[i]]);
+      }
     }
     return res;
   }
@@ -46,7 +55,12 @@ function permute(
     typeof arr !== 'string'
       ? result
       : function () {
-          return result().join('');
+          const res = result();
+          if (Array.isArray(res)) {
+            return res.join('');
+          } else {
+            return res;
+          }
         };
 
   return function () {
@@ -88,9 +102,9 @@ function permute(
   };
 }
 
-permute.all = function (array: any[]) {
-  const generator = permute(array);
-  let next: string | any[] | undefined = array;
+permute.all = function <T>(array: PermutationObject<T>, length: number) {
+  const generator = permute<T>(array, length);
+  let next: string | PermutationObject<T> | undefined = array;
   const result = [];
   while (next !== undefined) {
     result.push(next);
