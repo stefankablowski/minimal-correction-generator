@@ -20,7 +20,6 @@ function permute(
   function swap(i: number, j: number) {
     swapIndex1 = i;
     swapIndex2 = j;
-    console.log(`${swapIndex1}${swapIndex2}`);
     let tmp = indices[i];
     indices[i] = indices[j];
     indices[j] = tmp;

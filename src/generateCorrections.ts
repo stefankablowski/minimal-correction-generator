@@ -102,8 +102,8 @@ export function generateAllMinimalCorrections(
       return minimizable(corr);
     }
   );
-  console.log('minimizable:');
-  Correction.printMinCorrections(minimizableCorrections);
+  // console.log('minimizable:');
+  // Correction.printMinCorrections(minimizableCorrections);
 
   return nonMinimizableCorrections;
 }
