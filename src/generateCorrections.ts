@@ -6,6 +6,8 @@ import {EditOperation} from './model/EditOperation/EditOperation';
 import {EmptyOperation} from './model/EditOperation/EmptyOperation';
 import {Grammar} from './model/Grammar';
 import {parseAndEncode, translateGrammar} from './translateGrammar';
+import {minimizable} from './minimize';
+import {partition} from './util';
 
 export function generateMinimalCorrectionsForOneWord(
   correctionLeadingToWord: Correction,
@@ -90,7 +92,16 @@ export function generateAllMinimalCorrections(
     remainingCorrectionsForNextIteration = [];
   }
 
-  return minimalCorrections;
+  const [minimizableCorrections, nonMinimizableCorrections] = partition(
+    minimalCorrections,
+    corr => {
+      return minimizable(corr);
+    }
+  );
+  console.log('minimizable:');
+  Correction.printMinCorrections(minimizableCorrections);
+
+  return nonMinimizableCorrections;
 }
 
 export function checkWordProblemForWords(

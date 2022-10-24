@@ -10,9 +10,13 @@ export function minimizable(
   return (
     undefined !==
     deletions.find((del: EditOperation, delIndex: number) => {
+      const delDestinationIndex = transitionIndex - 1;
+      if (delDestinationIndex < 1) {
+        return false;
+      }
       const {operations: propagated} = propagateFromTo(
         delIndex,
-        transitionIndex - 1,
+        delDestinationIndex,
         corr
       );
       for (

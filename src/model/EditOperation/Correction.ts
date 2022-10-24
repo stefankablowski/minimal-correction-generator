@@ -83,7 +83,10 @@ export class Correction implements Comparable<Correction> {
     resultingWord: Word,
     canonical = false
   ): Correction {
-    const newCorrection = new Correction([...this.operations].concat(eop));
+    const newCorrection = new Correction(
+      [...this.operations].concat(eop),
+      this.transitionIndex
+    );
     newCorrection.resultingWord = resultingWord;
     newCorrection.consumedIndices = this.consumedIndices;
     if (eop instanceof Deletion) {
