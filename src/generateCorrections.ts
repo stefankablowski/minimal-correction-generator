@@ -69,11 +69,11 @@ export function generateAllMinimalCorrections(
   );
   let remainingCorrections: Correction[] = [correctionLeadingToWord];
   let remainingCorrectionsForNextIteration: Correction[] = [];
-  const iterations = 5;
+  /* Cutoff */
+  let iterations = 50;
   let checkEmptyEditOperation = true;
 
-  //TODO: Better termination condition (no new corrections to be found)
-  for (let i = 0; i < iterations; i++) {
+  while (remainingCorrections.length > 0 && iterations > 0) {
     for (const corr of remainingCorrections) {
       const [currentRemainCorrections, currentMinCorrections] =
         generateMinimalCorrectionsForOneWord(
@@ -93,6 +93,7 @@ export function generateAllMinimalCorrections(
     }
     remainingCorrections = remainingCorrectionsForNextIteration;
     remainingCorrectionsForNextIteration = [];
+    iterations--;
   }
 
   const [minimizableCorrections, nonMinimizableCorrections] = partition(
