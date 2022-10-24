@@ -112,4 +112,16 @@ export class Correction implements Comparable<Correction> {
   public toString(): string {
     return this.operations.join();
   }
+
+  isEmpty(): boolean {
+    return !!this.operations.find(op => op.isEmpty());
+  }
+
+  static printMinCorrections(minCorrections: Correction[]) {
+    const str = minCorrections.join('\n');
+    console.log(str);
+    // console.log(
+    //   `${JSON.stringify(c.operations)}, resultingword: ${c.resultingWord}`
+    // )
+  }
 }

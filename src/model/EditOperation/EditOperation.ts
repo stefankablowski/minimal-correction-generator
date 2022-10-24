@@ -1,4 +1,4 @@
-import {Deletion, Insertion, Replacement} from '.';
+import {Deletion, Insertion, Replacement, EmptyOperation} from '.';
 import {Word} from '../Word';
 
 export abstract class EditOperation implements Comparable<EditOperation> {
@@ -122,5 +122,9 @@ export abstract class EditOperation implements Comparable<EditOperation> {
 
   isReplacement() {
     return this instanceof Replacement;
+  }
+
+  isEmpty() {
+    return this instanceof EmptyOperation;
   }
 }

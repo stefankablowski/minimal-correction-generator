@@ -5,6 +5,7 @@ import {
   sortOperationsByType,
   checkWordProblemForWords,
   generateAllMinimalCorrections,
+  generateOperationsForWordGeneral,
 } from '../src/generateCorrections';
 import {Correction} from '../src/model/EditOperation/Correction';
 import {EditOperation} from '../src/model/EditOperation/EditOperation';
@@ -231,7 +232,7 @@ test('Apple-Banana-Grammar', () => {
   const exprGrammar = translateGrammar(grammar, lexicon);
 
   const word = ['Banana', '+', 'Apple'];
-  const operations: EditOperation[] = generateOperationsForWord(
+  const operations: EditOperation[] = generateOperationsForWordGeneral(
     word,
     [false, false, false],
     grammar.terminals

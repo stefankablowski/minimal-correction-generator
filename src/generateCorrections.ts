@@ -17,13 +17,12 @@ export function generateMinimalCorrectionsForOneWord(
   checkEmptyEditOperation: boolean,
   canonical: boolean
 ): [Correction[], Correction[]] {
-  const {resultingWord: word, consumedIndices} = correctionLeadingToWord;
+  const {resultingWord: word} = correctionLeadingToWord;
 
   const operations: EditOperation[] = generateOperationsForWord(
     word,
-    consumedIndices,
+    correctionLeadingToWord,
     terminals,
-    correctionLeadingToWord.transitionIndex,
     canonical
   );
 
@@ -44,9 +43,13 @@ export function generateMinimalCorrectionsForOneWord(
   const resultMin = localMinCorr.map(([eop, word]) =>
     correctionLeadingToWord.extendByOperation(eop, word, canonical)
   );
-  const resultRemain = remainingCorrections.map(([eop, word]) =>
+  let resultRemain = remainingCorrections.map(([eop, word]) =>
     correctionLeadingToWord.extendByOperation(eop, word, canonical)
   );
+
+  /* Prevent generation of corrections with an EmptyOperation as Prefix */
+  resultRemain = resultRemain.filter(c => !c.isEmpty());
+
   return [resultRemain, resultMin];
 }
 
@@ -123,37 +126,116 @@ export function checkWordProblemForWords(
   return [minimal, remaining];
 }
 
+export function generateOperationsForWord(
+  word: Word,
+  correction: Correction,
+  alphabet: Alphabet,
+  canonical = false
+): EditOperation[] {
+  if (canonical) {
+    const {
+      consumedIndices,
+      transitionIndex,
+      operations: previousOperations,
+    } = correction;
+
+    const transitionToReplacementsOcccured =
+      transitionIndex !== Correction.TR_INDEX_DEFAULT;
+
+    return generateOperationsForWordCanonical(
+      word,
+      consumedIndices,
+      alphabet,
+      previousOperations,
+      transitionToReplacementsOcccured
+    );
+  } else {
+    const {consumedIndices} = correction;
+    return generateOperationsForWordGeneral(word, consumedIndices, alphabet);
+  }
+}
+
 /**
- * Generate deletion and replacement operations on all possible indices of the given word
+ *  Generate deletion and replacement operations on non-interfering indices of the given word, such that the requirements of the normal form are met:
+ * - all deletions first, then all replacements
+ * - indices of deletions are non-descending
+ * - indices of replacements are ascending
+ */
+export function generateOperationsForWordCanonical(
+  word: Word,
+  consumedIndices: boolean[],
+  alphabet: Alphabet,
+  previousOperations: EditOperation[],
+  transitionToReplacementsOcccured: boolean
+) {
+  const indexOfPrevOperation: number = previousOperations.length - 1;
+  const prevOperation: EditOperation = previousOperations[indexOfPrevOperation];
+
+  const determinePreviousOperationIndex = (
+    prevOperation: EditOperation
+  ): number => {
+    return prevOperation !== undefined
+      ? prevOperation.index
+      : Correction.TR_INDEX_DEFAULT;
+  };
+  const indexNotDescending = (i: number) => previousOperationIndex <= i;
+  /* When tansitioning from Deletion to Replacement, the Ascending condition is ignored */
+  const indexAscending = (i: number): boolean => {
+    if (prevOperation === undefined) return true;
+    return prevOperation === undefined || prevOperation.isDeletion()
+      ? true
+      : previousOperationIndex < i;
+  };
+
+  const symbolDiffersFrom = (symbol: string, currentSymbol: string) =>
+    symbol !== currentSymbol;
+  const indexConsumed = (i: number) => consumedIndices[i];
+
+  const previousOperationIndex = determinePreviousOperationIndex(prevOperation);
+  const potentialOperations: EditOperation[] = [];
+
+  for (let index = 0; index < word.length; index++) {
+    const currentSymbolInWord = word[index];
+    if (indexConsumed(index)) continue;
+    if (!transitionToReplacementsOcccured && indexNotDescending(index)) {
+      potentialOperations.push(new Deletion(currentSymbolInWord, index));
+    }
+    if (indexAscending(index)) continue;
+    for (const alphSymbol of alphabet) {
+      if (symbolDiffersFrom(currentSymbolInWord, alphSymbol)) {
+        potentialOperations.push(
+          new Replacement(currentSymbolInWord, alphSymbol, index)
+        );
+      }
+    }
+  }
+  return potentialOperations;
+}
+
+/**
+ * Generate deletion and replacement operations on all non-interfering indices of the given word
  * @param word
  * @param alphabet
  * @param transitionIndex of the correction leading to the word
  * @param canonical
  * @returns
  */
-export function generateOperationsForWord(
+export function generateOperationsForWordGeneral(
   word: Word,
   consumedIndices: boolean[],
-  alphabet: Alphabet,
-  transitionIndex = Correction.T_INDEX_DEFAULT,
-  canonical = false
+  alphabet: Alphabet
 ): EditOperation[] {
   const operations: EditOperation[] = [];
 
   for (let index = 0; index < word.length; index++) {
-    if (!consumedIndices[index]) {
-      const currentSymbol = word[index];
-      if (
-        (canonical && transitionIndex === Correction.T_INDEX_DEFAULT) ||
-        !canonical
-      ) {
-        operations.push(new Deletion(currentSymbol, index));
-      }
-      for (const symb of alphabet) {
-        // operations.push(new Insertion(symb, index));
-        if (symb !== currentSymbol) {
-          operations.push(new Replacement(currentSymbol, symb, index));
-        }
+    if (consumedIndices[index]) continue;
+    const currentSymbol = word[index];
+    operations.push(new Deletion(currentSymbol, index));
+
+    for (const symb of alphabet) {
+      // operations.push(new Insertion(symb, index));
+      if (symb !== currentSymbol) {
+        operations.push(new Replacement(currentSymbol, symb, index));
       }
     }
   }
