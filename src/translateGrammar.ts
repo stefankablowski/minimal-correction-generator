@@ -110,3 +110,7 @@ export function decodeString(
     return reverseLexicon.get(id);
   });
 }
+
+export function parseTreeContainsParses(parseTree: any[]) {
+  return parseTree.length > 0;
+}

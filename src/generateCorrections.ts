@@ -5,7 +5,11 @@ import {Correction} from './model/EditOperation/Correction';
 import {EditOperation} from './model/EditOperation/EditOperation';
 import {EmptyOperation} from './model/EditOperation/EmptyOperation';
 import {Grammar} from './model/Grammar';
-import {parseAndEncode, translateGrammar} from './translateGrammar';
+import {
+  parseAndEncode,
+  parseTreeContainsParses,
+  translateGrammar,
+} from './translateGrammar';
 import {minimizable} from './minimize';
 import {partition} from './util';
 
@@ -111,7 +115,7 @@ export function generateAllMinimalCorrections(
     }
   );
   // console.log('minimizable:');
-  // Correction.printMinCorrections(minimizableCorrections);
+  Correction.printMinCorrections(minimizableCorrections);
 
   return nonMinimizableCorrections;
 }
@@ -269,8 +273,4 @@ export function sortOperationsByType(
   const replacements = operations.filter(op => op instanceof Replacement);
   const deletions = operations.filter(op => op instanceof Deletion);
   return [...insertions, ...replacements, ...deletions];
-}
-
-function parseTreeContainsParses(parseTree: any[]) {
-  return parseTree.length > 0;
 }
