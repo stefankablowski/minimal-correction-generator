@@ -1,9 +1,15 @@
 import {EditOperation, Correction} from './model/EditOperation';
 
+/**
+ * Checks whether a correction is minimizable and, if a correction is given, modifies the correction to the minimized version. A correction is minimizable if the propagation of a deletion and a replacement to the center (transitionIndex) can be simplified to a single deletion.
+ */
 export function minimizable(
   corr: Correction,
   foundMinimization?: Correction
 ): boolean {
+  if (corr.isEmpty()) {
+    return false;
+  }
   const {operations, transitionIndex} = corr;
   const deletions = corr.operations.slice(0, transitionIndex);
   // propagate each deletion to the right and compare with each replacement
@@ -11,7 +17,7 @@ export function minimizable(
     undefined !==
     deletions.find((del: EditOperation, delIndex: number) => {
       const delDestinationIndex = transitionIndex - 1;
-      if (delDestinationIndex < 1) {
+      if (delDestinationIndex < 0) {
         return false;
       }
       const {operations: propagated} = propagateFromTo(
@@ -45,10 +51,8 @@ export function minimizable(
 
 export function minimize(corr: Correction): Correction | undefined {
   const minimzedCorrection: Correction = new Correction();
-  minimizable(corr, minimzedCorrection);
-  return minimzedCorrection.operations.length !== 0
-    ? minimzedCorrection
-    : undefined;
+
+  return minimizable(corr, minimzedCorrection) ? minimzedCorrection : undefined;
 }
 
 /**
