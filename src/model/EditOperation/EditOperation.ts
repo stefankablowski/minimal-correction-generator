@@ -109,6 +109,27 @@ export abstract class EditOperation implements Comparable<EditOperation> {
         return [new Deletion(op2.deleteSymbol, op2.index + 1), op1];
       }
     }
+    if (op1.isDeletion() && op2.isReplacement()) {
+      if (op1.index <= op2.index) {
+        return [
+          new Replacement(op2.deleteSymbol, op2.insertSymbol, op1.index + 1),
+          op1,
+        ];
+      } else {
+        return [op2, op1];
+      }
+    }
+
+    if (op1.isReplacement() && op2.isDeletion()) {
+      if (op1.index < op2.index) {
+        return [op2, op1];
+      } else if (op1.index > op2.index) {
+        return [
+          op2,
+          new Replacement(op1.deleteSymbol, op1.insertSymbol, op1.index - 1),
+        ];
+      }
+    }
     return undefined;
   }
 
