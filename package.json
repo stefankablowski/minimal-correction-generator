@@ -37,6 +37,7 @@
   "homepage": "https://github.com/stefankablowski/minimal-correction-generator#readme",
   "extends": "@tsconfig/node16-strictest-esm/tsconfig.json",
   "dependencies": {
-    "cfgrammar-tool": "^1.0.0"
+    "cfgrammar-tool": "^1.0.0",
+    "tslog": "^3.3.4"
   }
 }
