@@ -40,6 +40,7 @@ export function generateMinimalCorrectionsForOneWord(
     exprGrammar,
     lexicon
   );
+
   const resultMin = localMinCorr.map(([eop, word]) =>
     correctionLeadingToWord.extendByOperation(eop, word, canonical)
   );
@@ -48,7 +49,14 @@ export function generateMinimalCorrectionsForOneWord(
   );
 
   /* Prevent generation of corrections with an EmptyOperation as Prefix */
-  resultRemain = resultRemain.filter(c => !c.isEmpty());
+  if (checkEmptyEditOperation) {
+    const filtered = resultMin.filter(c => c.isEmpty());
+    if (filtered.length > 0) {
+      return [[], filtered];
+    } else {
+      resultRemain = resultRemain.filter(c => !c.isEmpty());
+    }
+  }
 
   return [resultRemain, resultMin];
 }
@@ -201,7 +209,7 @@ export function generateOperationsForWordCanonical(
     if (!transitionToReplacementsOcccured && indexNotDescending(index)) {
       potentialOperations.push(new Deletion(currentSymbolInWord, index));
     }
-    if (indexAscending(index)) continue;
+    if (!indexAscending(index)) continue;
     for (const alphSymbol of alphabet) {
       if (symbolDiffersFrom(currentSymbolInWord, alphSymbol)) {
         potentialOperations.push(
