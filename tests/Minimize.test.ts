@@ -87,3 +87,16 @@ describe('Minimize', () => {
   );
   expect(minimizable(c5)).toBe(false);
 });
+
+test('Minimize Deletion, Replacement', () => {
+  const c1 = new Correction(
+    [new Deletion('Apple', 3), new Replacement('+', 'Apple', 2)],
+    1
+  );
+  expect(minimizable(c1)).toBe(true);
+  const c2 = new Correction(
+    [new Deletion('Banana', 0), new Replacement('+', 'Banana', 0)],
+    1
+  );
+  expect(minimizable(c2)).toBe(true);
+});
