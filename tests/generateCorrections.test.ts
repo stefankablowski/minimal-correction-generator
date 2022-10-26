@@ -10,7 +10,13 @@ import {
 import {Correction} from '../src/model/EditOperation/Correction';
 import {EditOperation} from '../src/model/EditOperation/EditOperation';
 import {Word} from '../src/model/Word';
-import {Deletion, Insertion, Replacement} from '../src/model/EditOperation';
+import {
+  Deletion,
+  EmptyOperation,
+  Insertion,
+  Replacement,
+} from '../src/model/EditOperation';
+import {startValidation} from '../src/validateCorrections';
 
 describe('generateCorrections', () => {
   test('Correction Biogrammar', () => {
@@ -264,18 +270,28 @@ test('Apple-Banana-Grammar', () => {
     word
   );
 
-  const minCorrections: Correction[] = generateAllMinimalCorrections(
+  const minCorrOnlyEmpty: Correction[] = generateAllMinimalCorrections(
     word,
     grammar,
     true
   );
-  printMinCorrections(minCorrections);
+  const c1 = new Correction([new EmptyOperation()]);
+  c1.resultingWord = word;
+  c1.consumedIndices = [false, false, false];
+  expect(minCorrOnlyEmpty).toStrictEqual([c1] as Correction[]);
+
+  const word2 = ['Banana', '+', '+', 'Apple'];
+
+  let minCorrections: Correction[] = generateAllMinimalCorrections(
+    word2,
+    grammar,
+    true
+  );
+  Correction.printMinCorrections(minCorrections);
+
+  minCorrections = startValidation(minCorrections, word2, grammar);
+  console.log('Validated:');
+  Correction.printMinCorrections(minCorrections);
+
   console.log(minCorrections.length);
 });
-function printMinCorrections(minCorrections: Correction[]) {
-  const str = minCorrections.join('\n');
-  console.log(str);
-  // console.log(
-  //   `${JSON.stringify(c.operations)}, resultingword: ${c.resultingWord}`
-  // )
-}
