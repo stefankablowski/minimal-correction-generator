@@ -31,6 +31,12 @@ export abstract class EditOperation implements Comparable<EditOperation> {
     );
   }
 
+  /**
+   * Simplifies a pair of EditOperations.
+   * @param op1
+   * @param op2
+   * @returns Simplified Tuple if simplification exists, Original Tuple if no simplification rule matches
+   */
   static simplifyPair(op1: EditOperation, op2: EditOperation): EditOperation[] {
     /* Simplify according to standard table */
     // a)
