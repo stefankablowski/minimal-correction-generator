@@ -17,3 +17,11 @@ export function partition<T>(
     [pass, fail]
   );
 }
+
+export function* iteratePairwise<T>(arr: Array<T>) {
+  for (let index = 0; index < arr.length - 1; index++) {
+    const currentOperation = arr[index];
+    const nextOperation = arr[index + 1];
+    yield {value: [currentOperation, nextOperation], index};
+  }
+}

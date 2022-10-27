@@ -1,3 +1,4 @@
+import {iteratePairwise} from '../../util';
 import {Word} from '../Word';
 import {Deletion} from './Deletion';
 import {EditOperation} from './EditOperation';
@@ -148,5 +149,18 @@ export class Correction implements Comparable<Correction> {
     // console.log(
     //   `${JSON.stringify(c.operations)}, resultingword: ${c.resultingWord}`
     // )
+  }
+
+  static simplifiable(operations: EditOperation[]) {
+    const operationPairs = iteratePairwise<EditOperation>(operations);
+    for (const {
+      value: [current, next],
+      index,
+    } of operationPairs) {
+      const simplifiedPair = EditOperation.simplifyPair(current, next);
+      const simplificationFound: boolean = simplifiedPair.length !== 2;
+      if (simplificationFound) return true;
+    }
+    return false;
   }
 }

@@ -91,6 +91,7 @@ describe('Corrections', () => {
     ]);
 
     expect(c1.simplify().equals(c2)).toBe(true);
+    expect(Correction.simplifiable(c1.operations)).toBe(false);
   });
   test('Simplifiable to empty ()', () => {
     const c1 = new Correction([new Insertion('n', 0), new Deletion('n', 0)]);
@@ -98,5 +99,7 @@ describe('Corrections', () => {
     const c3 = new Correction([]);
     expect(c2).toEqual(c3);
     expect(c2.equals(c3)).toBe(true);
+    expect(Correction.simplifiable(c1.operations)).toBe(true);
+    expect(Correction.simplifiable(c3.operations)).toBe(false);
   });
 });
