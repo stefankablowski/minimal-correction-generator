@@ -1,4 +1,5 @@
 import {Cache} from './Cache';
+import {log} from './log';
 import {Word} from './model';
 import {Correction, EditOperation} from './model/EditOperation';
 import {Grammar} from './model/Grammar';
@@ -8,9 +9,6 @@ import {
   parseTreeContainsParses,
   translateGrammar,
 } from './translateGrammar';
-import {Logger} from 'tslog';
-
-const log: Logger = new Logger({minLevel: 'info'});
 
 export function correctionSwapFunction(
   index1: number,
