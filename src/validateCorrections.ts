@@ -52,12 +52,16 @@ function validateCorrections(
       c.operations.length,
       correctionSwapFunction
     )) {
+      const simplifiable = Correction.simplifiable(
+        permutation as EditOperation[]
+      );
+
       for (const prefix of (permutation as Correction).iteratePrefixes()) {
         const resultingWord = Correction.apply(
           prefix as EditOperation[],
           inputWord
         );
-        const result: boolean = parseOrLoadFromCache(
+        const parseResult: boolean = parseOrLoadFromCache(
           permutation as EditOperation[],
           cache,
           resultingWord,
@@ -65,12 +69,14 @@ function validateCorrections(
           lexicon
         );
 
-        if (result) {
+        const correctionIsNotAminimal = parseResult || simplifiable;
+
+        if (correctionIsNotAminimal) {
           validated.splice(corrections.indexOf(c), 1);
           log.debug(
             `Omitting ${c.toString()} because prefix ${new Correction(
               prefix as EditOperation[]
-            ).toString()} matches grammar`
+            ).toString()} matches grammar or is simplifiable`
           );
           continue cFor;
         }
