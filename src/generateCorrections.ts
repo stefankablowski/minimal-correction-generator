@@ -1,3 +1,6 @@
+/**
+ * This file handles the optimized generation of corrections in a (canonical) normal form where indices are non-descending and deletions precede all insertions.
+ */
 import {Word} from './model';
 import {Alphabet} from './model/Alphabet';
 import {Deletion, Insertion, Replacement} from './model/EditOperation';

@@ -1,36 +1,44 @@
 # minimal-correction-generator
 
-**Setup**
-This project is formatted using Google Typescript Style and Prettier VSCode extension
+Tool to generate automatic sentence corrections that are minimal. Corrections transform a word so that it matches the given (context-free) grammar.
 
-**Example**
+Used in teaching of biology to assist pupils find their mistakes when writing hypotheses for biological experiments. Formulating hypotheses is part of the scientific method.
 
-_Possible libraries:_
+## Installation
 
-## Earley-Parser-JS
+**Requirements**
 
-- could not integrate into typescript project
-- https://github.com/lagodiuk/earley-parser-js#
+- NodeJS v16+ (recommended installation via Node Version Manager)
 
-## Chart-parsers
+  > In project root, run:
 
-- only generates the parsing charts, you still need to find the parses
-- https://www.npmjs.com/package/chart-parsers
+  > `npm install`
 
-## CFGrammar-Tool
+**Run Tests**
 
-- https://www.npmjs.com/package/cfgrammar-tool <
-  Supports multi-character Nonterminals
-  Does not support multi-character Terminals
+> `npm run test`
 
-## Nearley.js
+> See scripts in `package.json` for all commands
 
-- need to define Grammar at compiletime(custom format)
-- https://nearley.js.org/docs/tokenizers
-  Custom .ne file format
+**Used Libraries**
 
-Encode Terminals so that
-[{Terminal: Code}]
-Translate Grammar, put Lexicon[Terminal]
+- [Johnson-Steinhaus-Trotter Algorithm by nodash](https://github.com/nodash/steinhaus-johnson-trotter)
+  > Generates all permutations of a sequence swapping element pairs
+- [TSlog](https://tslog.js.org/#/)
+  > Simple Typescript Logger
+- [CFGrammar-Tool](https://github.com/bakkot/cfgrammar-tool)
+  > Solves word problem for context-free languages in O(n³)
 
-Encode Input [Terminal, Terminal...] so that [Code, Code]
+### Recommended Setup:
+
+- Visual Studio Code
+
+  - Prettier Extension
+  - Jest Extension
+  - ESLint
+
+  This project is formatted using Google Typescript Style (GTS) and Prettier VSCode extension
+
+> Format contributions with GTS
+
+> `npm run fix`

@@ -1,3 +1,6 @@
+/**
+ * This file provides a function to check whether generated correction candidates (possibly minimal) are actually minimal. All permutations and all prefixes of these permutations are tested against the input word and grammar.
+ */
 import {Cache} from './Cache';
 import {log} from './log';
 import {Word} from './model';
