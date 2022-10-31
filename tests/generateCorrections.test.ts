@@ -283,7 +283,7 @@ test('Apple-Banana-Grammar', () => {
 
   let [minCorrections, remainingCorrections]: [Correction[], Correction[]] =
     generateAllMinimalCorrections(word2, grammar, true);
-  Correction.printMinCorrections(minCorrections);
+  Correction.printCorrections(minCorrections, 'Candidates (p-minimal)');
 
   const cache = new Cache<EditOperation[], boolean>();
 
@@ -294,8 +294,7 @@ test('Apple-Banana-Grammar', () => {
     lexicon,
     cache
   );
-  console.log('Validated:');
-  Correction.printMinCorrections(minCorrections);
+  Correction.printCorrections(minCorrections, 'Validated (a-minimal)');
 
   const fullCorrections = generateFullCorrections(
     remainingCorrections,
@@ -305,8 +304,5 @@ test('Apple-Banana-Grammar', () => {
     cache,
     exprGrammar
   );
-  console.log('fullcorrections');
-  Correction.printMinCorrections(fullCorrections);
-
-  console.log(minCorrections.length);
+  Correction.printCorrections(fullCorrections, 'Including Insertions');
 });

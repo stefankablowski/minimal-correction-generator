@@ -119,8 +119,7 @@ export function generateAllMinimalCorrections(
       return minimizable(corr);
     }
   );
-  // console.log('minimizable:');
-  Correction.printMinCorrections(minimizableCorrections);
+  Correction.printCorrections(minimizableCorrections, 'Minimizable are');
 
   return [nonMinimizableCorrections, remainingCorrections];
 }

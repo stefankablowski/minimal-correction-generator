@@ -3,6 +3,7 @@ import {Word} from '../Word';
 import {Deletion} from './Deletion';
 import {EditOperation} from './EditOperation';
 import {Replacement} from './Replacement';
+import {log} from '../../log';
 
 /**
  * @param consumedIndices bitmask tracking for which positions of the original word edit operations have been generated. true = edit operation has been generated on that index.
@@ -147,9 +148,11 @@ export class Correction implements Comparable<Correction> {
     }, word);
   }
 
-  static printMinCorrections(minCorrections: Correction[]) {
+  static printCorrections(minCorrections: Correction[], message = '') {
     const str = minCorrections.join('\n');
-    console.log(str);
+
+    log.debug('\n - '.concat(message).concat('\n').concat(str));
+    // console.log(str);
     // console.log(
     //   `${JSON.stringify(c.operations)}, resultingword: ${c.resultingWord}`
     // )

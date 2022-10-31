@@ -76,8 +76,8 @@ function validateCorrections(
 
         if (correctionIsNotAminimal) {
           validated.splice(corrections.indexOf(c), 1);
-          log.debug(
-            `Omitting ${c.toString()} because prefix ${new Correction(
+          log.silly(
+            `Omitting ${c.toString()},\nbecause prefix ${new Correction(
               prefix as EditOperation[]
             ).toString()} matches grammar or is simplifiable`
           );
