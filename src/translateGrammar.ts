@@ -42,7 +42,7 @@ export function encodeStringArray(
 export function translateGrammar(
   grammar: Grammar,
   lexicon: Map<string, string>
-) {
+): Grammar {
   const earleyGrammar: any = [];
 
   encodeTerminals(grammar.terminals, lexicon);

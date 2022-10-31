@@ -22,14 +22,16 @@ export function correctionSwapFunction(
   return (oldArray as Correction).swap(minIndex);
 }
 
+/**
+ * @returns only those of the given corrections that are actually minimal (a-minimal), i.e. have a permutation of which a true prefix (the permutation itself is excluded) whose application on the input word matches the language
+ */
 export function startValidation(
   corrections: Correction[],
   inputWord: Word,
-  grammar: Grammar
-) {
-  const cache = new Cache<EditOperation[], boolean>();
-  const lexicon = new Map<string, string>();
-  const exprGrammar = translateGrammar(grammar, lexicon);
+  exprGrammar: any,
+  lexicon: Map<string, string>,
+  cache: Cache<EditOperation[], boolean>
+): Correction[] {
   return validateCorrections(
     cache,
     corrections,
@@ -57,7 +59,7 @@ function validateCorrections(
         permutation as EditOperation[]
       );
 
-      for (const prefix of (permutation as Correction).iteratePrefixes()) {
+      for (const prefix of (permutation as Correction).iterateTruePrefixes()) {
         const resultingWord = Correction.apply(
           prefix as EditOperation[],
           inputWord

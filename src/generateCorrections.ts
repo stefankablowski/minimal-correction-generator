@@ -15,6 +15,8 @@ import {
 } from './translateGrammar';
 import {minimizable} from './minimize';
 import {partition} from './util';
+import {startValidation} from './validateCorrections';
+import {Cache} from './Cache';
 
 export function generateMinimalCorrectionsForOneWord(
   correctionLeadingToWord: Correction,
@@ -72,7 +74,7 @@ export function generateAllMinimalCorrections(
   word: Word,
   grammar: Grammar,
   canonical = false
-): Correction[] {
+): [Correction[], Correction[]] {
   const lexicon = new Map<string, string>();
   const exprGrammar = translateGrammar(grammar, lexicon);
   let minimalCorrections: Correction[] = [];
@@ -120,7 +122,7 @@ export function generateAllMinimalCorrections(
   // console.log('minimizable:');
   Correction.printMinCorrections(minimizableCorrections);
 
-  return nonMinimizableCorrections;
+  return [nonMinimizableCorrections, remainingCorrections];
 }
 
 export function checkWordProblemForWords(
@@ -169,6 +171,74 @@ export function generateOperationsForWord(
     const {consumedIndices} = correction;
     return generateOperationsForWordGeneral(word, consumedIndices, alphabet);
   }
+}
+
+export function generateFullCorrections(
+  remainingCorrections: Correction[],
+  alphabet: string[],
+  inputWord: Word,
+  lexicon: Map<string, string>,
+  cache: Cache<EditOperation[], boolean>,
+  exprGrammar: any
+) {
+  const allRemaining: Correction[] = [];
+
+  /* Also consider corrections without prior deletions or replacements. Only add them once! */
+  const newCorrection = new Correction();
+  newCorrection.resultingWord = inputWord;
+  remainingCorrections.push(newCorrection);
+
+  for (const corr of remainingCorrections) {
+    const insertionCandidates = generateInsertionsForWord(corr, alphabet);
+    //TODO optimization possible
+
+    const wordsWithOperation: [EditOperation, Word][] = insertionCandidates.map(
+      ins => [ins, ins.apply(inputWord)]
+    );
+
+    const [wordsWithOperationMatchingGrammar]: [
+      true: [EditOperation, Word][],
+      false: [EditOperation, Word][]
+    ] = checkWordProblemForWords(wordsWithOperation, exprGrammar, lexicon);
+
+    const insertionCandidatesMatchingGrammar =
+      wordsWithOperationMatchingGrammar.map(([eop, word]) => eop);
+
+    const extendedRemainingCorrections = insertionCandidatesMatchingGrammar.map(
+      ins => {
+        const resultingWord = ins.apply(corr.resultingWord);
+        return corr.extendByOperation(ins, resultingWord);
+      }
+    );
+
+    //TODO startValidation should return minimal also?
+    const remaining: Correction[] = startValidation(
+      extendedRemainingCorrections,
+      inputWord,
+      exprGrammar,
+      lexicon,
+      cache
+    );
+    allRemaining.push(...remaining);
+  }
+  return allRemaining;
+}
+
+/**
+ * @returns a list of insertions for every index of the word that the correction leads to and for every alphabet symbol
+ */
+export function generateInsertionsForWord(
+  correction: Correction,
+  alphabet: Alphabet
+) {
+  const {resultingWord}: Correction = correction;
+  const insertions: Insertion[] = [];
+  for (let index = 0; index < resultingWord.length; index++) {
+    for (const alphSymbol of alphabet) {
+      insertions.push(new Insertion(alphSymbol, index));
+    }
+  }
+  return insertions;
 }
 
 /**

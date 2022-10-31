@@ -6,6 +6,7 @@ import {
   checkWordProblemForWords,
   generateAllMinimalCorrections,
   generateOperationsForWordGeneral,
+  generateFullCorrections,
 } from '../src/generateCorrections';
 import {Correction} from '../src/model/EditOperation/Correction';
 import {EditOperation} from '../src/model/EditOperation/EditOperation';
@@ -17,6 +18,7 @@ import {
   Replacement,
 } from '../src/model/EditOperation';
 import {startValidation} from '../src/validateCorrections';
+import {Cache} from '../src/Cache';
 
 describe('generateCorrections', () => {
   test('Correction Biogrammar', () => {
@@ -270,11 +272,8 @@ test('Apple-Banana-Grammar', () => {
     word
   );
 
-  const minCorrOnlyEmpty: Correction[] = generateAllMinimalCorrections(
-    word,
-    grammar,
-    true
-  );
+  const [minCorrOnlyEmpty]: [Correction[], Correction[]] =
+    generateAllMinimalCorrections(word, grammar, true);
   const c1 = new Correction([new EmptyOperation()]);
   c1.resultingWord = word;
   c1.consumedIndices = [false, false, false];
@@ -282,16 +281,32 @@ test('Apple-Banana-Grammar', () => {
 
   const word2 = ['Banana', '+', '+', 'Apple'];
 
-  let minCorrections: Correction[] = generateAllMinimalCorrections(
-    word2,
-    grammar,
-    true
-  );
+  let [minCorrections, remainingCorrections]: [Correction[], Correction[]] =
+    generateAllMinimalCorrections(word2, grammar, true);
   Correction.printMinCorrections(minCorrections);
 
-  minCorrections = startValidation(minCorrections, word2, grammar);
+  const cache = new Cache<EditOperation[], boolean>();
+
+  minCorrections = startValidation(
+    minCorrections,
+    word2,
+    exprGrammar,
+    lexicon,
+    cache
+  );
   console.log('Validated:');
   Correction.printMinCorrections(minCorrections);
+
+  const fullCorrections = generateFullCorrections(
+    remainingCorrections,
+    grammar.terminals,
+    word2,
+    lexicon,
+    cache,
+    exprGrammar
+  );
+  console.log('fullcorrections');
+  Correction.printMinCorrections(fullCorrections);
 
   console.log(minCorrections.length);
 });

@@ -92,7 +92,7 @@ export class Correction implements Comparable<Correction> {
   /**
    * @function iteratePrefixes returns all prefix of the operations, starting with the shortest prefix, ending  with a prefix ranging from the first to the forelast operation (excluding the last operation).
    */
-  *iteratePrefixes() {
+  *iterateTruePrefixes() {
     for (let range = 1; range < this.operations.length; range++) {
       yield this.operations.slice(0, range);
     }
@@ -107,6 +107,7 @@ export class Correction implements Comparable<Correction> {
       [...this.operations].concat(eop),
       this.transitionIndex
     );
+    //TODO add copy-method or auto-calculate these properties if not given
     newCorrection.resultingWord = resultingWord;
     newCorrection.consumedIndices = this.consumedIndices;
     if (eop instanceof Deletion) {
@@ -133,6 +134,9 @@ export class Correction implements Comparable<Correction> {
     return this.operations.join();
   }
 
+  /**
+   * @returns true if and only if the correction contains an element of type EmptyOperation
+   */
   isEmpty(): boolean {
     return !!this.operations.find(op => op.isEmpty());
   }
