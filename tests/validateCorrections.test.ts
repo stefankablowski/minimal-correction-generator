@@ -1,5 +1,4 @@
 import {EditOperation, Deletion, Correction} from '../src/model/EditOperation';
-import {startValidation} from '../src/validateCorrections';
 
 describe('validateCorrections', () => {
   test('Print all prefixes', () => {

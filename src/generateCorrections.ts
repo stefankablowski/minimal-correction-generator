@@ -15,7 +15,7 @@ import {
 } from './translateGrammar';
 import {minimizable} from './minimize';
 import {partition} from './util';
-import {startValidation} from './validateCorrections';
+import {validateCorrections} from './validateCorrections';
 import {Cache} from './Cache';
 
 export function generateMinimalCorrectionsForOneWord(
@@ -84,6 +84,7 @@ export function generateAllMinimalCorrections(
     {length: word.length},
     () => false
   );
+  const allRemainingPrefixes: Correction[] = [];
   let remainingCorrections: Correction[] = [correctionLeadingToWord];
   let remainingCorrectionsForNextIteration: Correction[] = [];
   /* Cutoff */
@@ -108,6 +109,7 @@ export function generateAllMinimalCorrections(
       ];
       minimalCorrections = [...currentMinCorrections, ...minimalCorrections];
     }
+    allRemainingPrefixes.push(...remainingCorrectionsForNextIteration);
     remainingCorrections = remainingCorrectionsForNextIteration;
     remainingCorrectionsForNextIteration = [];
     iterations--;
@@ -121,7 +123,7 @@ export function generateAllMinimalCorrections(
   );
   Correction.printCorrections(minimizableCorrections, 'Minimizable are');
 
-  return [nonMinimizableCorrections, remainingCorrections];
+  return [nonMinimizableCorrections, allRemainingPrefixes];
 }
 
 export function checkWordProblemForWords(
@@ -192,7 +194,7 @@ export function generateFullCorrections(
     //TODO optimization possible
 
     const wordsWithOperation: [EditOperation, Word][] = insertionCandidates.map(
-      ins => [ins, ins.apply(inputWord)]
+      ins => [ins, ins.apply(corr.resultingWord)]
     );
 
     const [wordsWithOperationMatchingGrammar]: [
@@ -210,8 +212,7 @@ export function generateFullCorrections(
       }
     );
 
-    //TODO startValidation should return minimal also?
-    const remaining: Correction[] = startValidation(
+    const remaining: Correction[] = validateCorrections(
       extendedRemainingCorrections,
       inputWord,
       exprGrammar,

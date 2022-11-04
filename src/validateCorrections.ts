@@ -23,40 +23,25 @@ export function correctionSwapFunction(
 }
 
 /**
- * @returns only those of the given corrections that are actually minimal (a-minimal), i.e. have a permutation of which a true prefix (the permutation itself is excluded) whose application on the input word matches the language
+ * @returns only those of the given corrections that are actually minimal (a-minimal), i.e. dont have a permutation of which a true prefix exists (the permutation itself is excluded) whose application on the input word matches the language
  */
-export function startValidation(
+export function validateCorrections(
   corrections: Correction[],
   inputWord: Word,
   exprGrammar: any,
   lexicon: Map<string, string>,
   cache: Cache<EditOperation[], boolean>
 ): Correction[] {
-  return validateCorrections(
-    cache,
-    corrections,
-    inputWord,
-    exprGrammar,
-    lexicon
-  );
-}
-
-function validateCorrections(
-  cache: Cache<EditOperation[], boolean>,
-  corrections: Correction[],
-  inputWord: Word,
-  exprGrammar: any,
-  lexicon: Map<string, string>
-): Correction[] {
-  const validated = [...corrections];
+  const sortedOutIndices: number[] = [];
   cFor: for (const c of corrections) {
     for (const permutation of generatePermutationTyped<Correction>(
       c,
       c.operations.length,
       correctionSwapFunction
     )) {
+      // console.log(permutation.toString());
       const simplifiable = Correction.simplifiable(
-        permutation as EditOperation[]
+        (permutation as Correction).operations
       );
 
       for (const prefix of (permutation as Correction).iterateTruePrefixes()) {
@@ -75,7 +60,7 @@ function validateCorrections(
         const correctionIsNotAminimal = parseResult || simplifiable;
 
         if (correctionIsNotAminimal) {
-          validated.splice(corrections.indexOf(c), 1);
+          sortedOutIndices.push(corrections.indexOf(c), 1);
           log.silly(
             `Omitting ${c.toString()},\nbecause prefix ${new Correction(
               prefix as EditOperation[]
@@ -87,7 +72,7 @@ function validateCorrections(
     }
   }
 
-  return validated;
+  return corrections.filter((elem, index) => !sortedOutIndices.includes(index));
 }
 
 function parseOrLoadFromCache(

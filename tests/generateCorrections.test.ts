@@ -17,8 +17,9 @@ import {
   Insertion,
   Replacement,
 } from '../src/model/EditOperation';
-import {startValidation} from '../src/validateCorrections';
+import {validateCorrections} from '../src/validateCorrections';
 import {Cache} from '../src/Cache';
+import {Grammar} from '../src/model/Grammar';
 
 describe('generateCorrections', () => {
   test('Correction Biogrammar', () => {
@@ -280,16 +281,27 @@ test('Apple-Banana-Grammar', () => {
   expect(minCorrOnlyEmpty).toStrictEqual([c1] as Correction[]);
 
   const word2 = ['Banana', '+', '+', 'Apple'];
-
-  let [minCorrections, remainingCorrections]: [Correction[], Correction[]] =
-    generateAllMinimalCorrections(word2, grammar, true);
-  Correction.printCorrections(minCorrections, 'Candidates (p-minimal)');
-
+  generateMinimalCorrectionsForWord(word2, grammar);
+});
+function generateMinimalCorrectionsForWord(
+  word: Word,
+  grammar: {
+    rules: Map<string, string[][]>;
+    terminals: string[];
+    rootRule: string;
+  }
+) {
+  const lexicon = new Map<string, string>();
+  const exprGrammar = translateGrammar(grammar, lexicon);
   const cache = new Cache<EditOperation[], boolean>();
 
-  minCorrections = startValidation(
+  let [minCorrections, remainingCorrections]: [Correction[], Correction[]] =
+    generateAllMinimalCorrections(word, grammar, true);
+  Correction.printCorrections(minCorrections, 'Candidates (p-minimal)');
+
+  minCorrections = validateCorrections(
     minCorrections,
-    word2,
+    word,
     exprGrammar,
     lexicon,
     cache
@@ -299,10 +311,10 @@ test('Apple-Banana-Grammar', () => {
   const fullCorrections = generateFullCorrections(
     remainingCorrections,
     grammar.terminals,
-    word2,
+    word,
     lexicon,
     cache,
     exprGrammar
   );
   Correction.printCorrections(fullCorrections, 'Including Insertions');
-});
+}
