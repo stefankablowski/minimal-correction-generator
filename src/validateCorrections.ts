@@ -50,7 +50,7 @@ export function validateCorrections(
           inputWord
         );
         const parseResult: boolean = parseOrLoadFromCache(
-          permutation as EditOperation[],
+          prefix,
           cache,
           resultingWord,
           exprGrammar,

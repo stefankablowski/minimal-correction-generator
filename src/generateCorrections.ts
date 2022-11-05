@@ -211,17 +211,16 @@ export function generateFullCorrections(
         return corr.extendByOperation(ins, resultingWord);
       }
     );
-
-    const remaining: Correction[] = validateCorrections(
-      extendedRemainingCorrections,
-      inputWord,
-      exprGrammar,
-      lexicon,
-      cache
-    );
-    allRemaining.push(...remaining);
+    allRemaining.push(...extendedRemainingCorrections);
   }
-  return allRemaining;
+
+  return validateCorrections(
+    allRemaining,
+    inputWord,
+    exprGrammar,
+    lexicon,
+    cache
+  );
 }
 
 /**
