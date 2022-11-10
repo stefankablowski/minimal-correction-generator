@@ -232,7 +232,7 @@ export function generateInsertionsForWord(
 ) {
   const {resultingWord}: Correction = correction;
   const insertions: Insertion[] = [];
-  for (let index = 0; index < resultingWord.length; index++) {
+  for (let index = 0; index <= resultingWord.length; index++) {
     for (const alphSymbol of alphabet) {
       insertions.push(new Insertion(alphSymbol, index));
     }
