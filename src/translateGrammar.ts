@@ -80,6 +80,7 @@ export function encodeTerminals(
   terminals.forEach(terminal => {
     lexicon.set(terminal, makeid());
   });
+  resetid();
 }
 
 let id = 0;
@@ -90,6 +91,10 @@ export function makeid() {
   const characters =
     'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   return characters[id++];
+}
+
+function resetid() {
+  id = 0;
 }
 
 /**
