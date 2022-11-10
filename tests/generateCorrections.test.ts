@@ -1,4 +1,9 @@
-import {translateGrammar, parseAndEncode} from '../src/translateGrammar';
+import {
+  translateGrammar,
+  parseAndEncode,
+  cfgtool,
+  decodeString,
+} from '../src/translateGrammar';
 import {
   generateOperationsForWord,
   applyOperationsToWord,
@@ -226,6 +231,38 @@ describe('generateCorrections', () => {
     expect(
       parseAndEncode(lexicon, exprGrammar, sentence2).length > 0
     ).toBeTruthy();
+
+    exprGrammar;
+    const generatorFactory = cfgtool.generator;
+    const generator = generatorFactory(exprGrammar);
+    for (let index = 0; index < 30; index++) {
+      const generatedString = generator(index);
+      if (generatedString) {
+        // console.log(decodeString(generatedString, lexicon).join(','));
+      }
+    }
+
+    const sentence3 = [
+      'der|die|das|den',
+      'Waerme',
+      'beeinflusst',
+      'der|die|das|den',
+      'Hefeaktivitaet',
+      ', aber nur',
+      'von 20 Grad bis 40 Grad',
+    ];
+    const sentence3faulty = [
+      'der|die|das|den',
+      'Waerme',
+      'beeinflusst',
+      'der|die|das|den',
+      'Hefeaktivitaet',
+      'von 20 Grad bis 40 Grad',
+    ];
+
+    // generateMinimalCorrectionsForWord(sentence3faulty, grammar, 2);
+    // generateMinimalCorrectionsForWord(sentence3faulty, grammar, 2);
+    // generateMinimalCorrectionsForWord(sentence3faulty, grammar, 3);
   });
 });
 test('Apple-Banana-Grammar', () => {
@@ -237,8 +274,6 @@ test('Apple-Banana-Grammar', () => {
     terminals: ['Banana', 'Apple', '+'],
     rootRule: 'S',
   };
-  const lexicon = new Map<string, string>();
-  const exprGrammar = translateGrammar(grammar, lexicon);
 
   const word = ['Banana', '+', 'Apple'];
   const operations: EditOperation[] = generateOperationsForWordGeneral(
@@ -281,7 +316,10 @@ test('Apple-Banana-Grammar', () => {
   expect(minCorrOnlyEmpty).toStrictEqual([c1] as Correction[]);
 
   const word2 = ['Banana', '+', '+', 'Apple'];
-  generateMinimalCorrectionsForWord(word2, grammar);
+  const word3 = ['Banana', 'Apple', 'Banana'];
+  const word4 = ['+'];
+  //Expect Insertions left and right
+  generateMinimalCorrectionsForWord(word4, grammar, 2);
 });
 function generateMinimalCorrectionsForWord(
   word: Word,
@@ -289,14 +327,17 @@ function generateMinimalCorrectionsForWord(
     rules: Map<string, string[][]>;
     terminals: string[];
     rootRule: string;
-  }
+  },
+  iterations: number
 ) {
   const lexicon = new Map<string, string>();
   const exprGrammar = translateGrammar(grammar, lexicon);
   const cache = new Cache<EditOperation[], boolean>();
 
-  let [minCorrections, remainingCorrections]: [Correction[], Correction[]] =
-    generateAllMinimalCorrections(word, grammar, true);
+  const minAndRemainingCorrections: [Correction[], Correction[]] =
+    generateAllMinimalCorrections(word, grammar, true, iterations);
+  let [minCorrections] = minAndRemainingCorrections;
+  const [, remainingCorrections] = minAndRemainingCorrections;
   Correction.printCorrections(minCorrections, 'Candidates (p-minimal)');
 
   minCorrections = validateCorrections(
@@ -314,7 +355,8 @@ function generateMinimalCorrectionsForWord(
     word,
     lexicon,
     cache,
-    exprGrammar
+    exprGrammar,
+    iterations
   );
   Correction.printCorrections(fullCorrections, 'Including Insertions');
 }
