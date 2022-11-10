@@ -73,7 +73,8 @@ export function generateMinimalCorrectionsForOneWord(
 export function generateAllMinimalCorrections(
   word: Word,
   grammar: Grammar,
-  canonical = false
+  canonical = false,
+  iterations = 1
 ): [Correction[], Correction[]] {
   const lexicon = new Map<string, string>();
   const exprGrammar = translateGrammar(grammar, lexicon);
@@ -88,7 +89,6 @@ export function generateAllMinimalCorrections(
   let remainingCorrections: Correction[] = [correctionLeadingToWord];
   let remainingCorrectionsForNextIteration: Correction[] = [];
   /* Cutoff */
-  let iterations = 50;
   let checkEmptyEditOperation = true;
 
   while (remainingCorrections.length > 0 && iterations > 0) {
@@ -180,7 +180,8 @@ export function generateFullCorrections(
   inputWord: Word,
   lexicon: Map<string, string>,
   cache: Cache<EditOperation[], boolean>,
-  exprGrammar: any
+  exprGrammar: any,
+  iterations = 1
 ) {
   const allRemaining: Correction[] = [];
 
@@ -189,29 +190,39 @@ export function generateFullCorrections(
   newCorrection.resultingWord = inputWord;
   remainingCorrections.push(newCorrection);
 
-  for (const corr of remainingCorrections) {
-    const insertionCandidates = generateInsertionsForWord(corr, alphabet);
-    //TODO optimization possible
+  //TODO optimization possible: unpack these from all prefixes of minimal corrections
+  let correctionsForNextIteration: Correction[] = remainingCorrections;
+  for (let i = 0; i < iterations; i++) {
+    const correctionsForNextIterationBuffer: Correction[] = [];
+    for (const corr of correctionsForNextIteration) {
+      const insertionCandidates = generateInsertionsForWord(corr, alphabet);
 
-    const wordsWithOperation: [EditOperation, Word][] = insertionCandidates.map(
-      ins => [ins, ins.apply(corr.resultingWord)]
-    );
+      const wordsWithOperation: [EditOperation, Word][] =
+        insertionCandidates.map(ins => [ins, ins.apply(corr.resultingWord)]);
 
-    const [wordsWithOperationMatchingGrammar]: [
-      true: [EditOperation, Word][],
-      false: [EditOperation, Word][]
-    ] = checkWordProblemForWords(wordsWithOperation, exprGrammar, lexicon);
+      const [
+        wordsWithOperationMatchingGrammar,
+        wordsWithOperationNotMatchingGrammar,
+      ]: [true: [EditOperation, Word][], false: [EditOperation, Word][]] =
+        checkWordProblemForWords(wordsWithOperation, exprGrammar, lexicon);
 
-    const insertionCandidatesMatchingGrammar =
-      wordsWithOperationMatchingGrammar.map(([eop, word]) => eop);
-
-    const extendedRemainingCorrections = insertionCandidatesMatchingGrammar.map(
-      ins => {
-        const resultingWord = ins.apply(corr.resultingWord);
-        return corr.extendByOperation(ins, resultingWord);
-      }
-    );
-    allRemaining.push(...extendedRemainingCorrections);
+      const extendedMatchingCorrections = wordsWithOperationMatchingGrammar.map(
+        ([ins, word]: [EditOperation, Word]) => {
+          const resultingWord = ins.apply(corr.resultingWord);
+          return corr.extendByOperation(ins, resultingWord);
+        }
+      );
+      const extendedNotMatchingCorrections =
+        wordsWithOperationNotMatchingGrammar.map(
+          ([ins, word]: [EditOperation, Word]) => {
+            const resultingWord = ins.apply(corr.resultingWord);
+            return corr.extendByOperation(ins, resultingWord);
+          }
+        );
+      correctionsForNextIterationBuffer.push(...extendedNotMatchingCorrections);
+      allRemaining.push(...extendedMatchingCorrections);
+    }
+    correctionsForNextIteration = correctionsForNextIterationBuffer;
   }
 
   return validateCorrections(
