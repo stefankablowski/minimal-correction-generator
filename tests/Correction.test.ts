@@ -102,4 +102,15 @@ describe('Corrections', () => {
     expect(Correction.simplifiable(c1.operations)).toBe(true);
     expect(Correction.simplifiable(c3.operations)).toBe(false);
   });
+
+  test('Normalize ', () => {
+    const operations = [
+      new Replacement('a', 'b', 0),
+      new Insertion('n', 0),
+      new Replacement('a', 'b', 2),
+      new Deletion('n', 1),
+    ];
+    const normalized = Correction.normalize(operations);
+    Correction.printCorrections([normalized]);
+  });
 });
