@@ -170,4 +170,18 @@ export class Correction implements Comparable<Correction> {
     }
     return false;
   }
+
+  static normalize(operations: EditOperation[]) {
+    let corr = new Correction(operations);
+    const n = operations.length;
+    for (let i = 0; i < n - 1; i++) {
+      for (let j = 0; j < n - 1 - i; j++) {
+        if (corr.operations[j].isInsertion()) {
+          corr = corr.swap(j);
+        }
+      }
+    }
+
+    return corr;
+  }
 }
