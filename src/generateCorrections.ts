@@ -18,6 +18,46 @@ import {partition} from './util';
 import {validateCorrections} from './validateCorrections';
 import {Cache} from './Cache';
 
+export function generateMinimalCorrectionsForWord(
+  word: Word,
+  grammar: {
+    rules: Map<string, string[][]>;
+    terminals: string[];
+    rootRule: string;
+  },
+  iterations: number
+) {
+  const lexicon = new Map<string, string>();
+  const exprGrammar = translateGrammar(grammar, lexicon);
+  const cache = new Cache<EditOperation[], boolean>();
+
+  const minAndRemainingCorrections: [Correction[], Correction[]] =
+    generateAllMinimalCorrections(word, grammar, true, iterations);
+  let [minCorrections] = minAndRemainingCorrections;
+  const [, remainingCorrections] = minAndRemainingCorrections;
+  Correction.printCorrections(minCorrections, 'Candidates (p-minimal)');
+
+  minCorrections = validateCorrections(
+    minCorrections,
+    word,
+    exprGrammar,
+    lexicon,
+    cache
+  );
+  Correction.printCorrections(minCorrections, 'Validated (a-minimal)');
+
+  const fullCorrections = generateFullCorrections(
+    remainingCorrections,
+    grammar.terminals,
+    word,
+    lexicon,
+    cache,
+    exprGrammar,
+    iterations
+  );
+  Correction.printCorrections(fullCorrections, 'Including Insertions');
+}
+
 export function generateMinimalCorrectionsForOneWord(
   correctionLeadingToWord: Correction,
   exprGrammar: any,

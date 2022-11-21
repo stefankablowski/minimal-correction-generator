@@ -2,29 +2,18 @@ import {
   translateGrammar,
   parseAndEncode,
   cfgtool,
-  decodeString,
 } from '../src/translateGrammar';
 import {
-  generateOperationsForWord,
   applyOperationsToWord,
   sortOperationsByType,
-  checkWordProblemForWords,
   generateAllMinimalCorrections,
   generateOperationsForWordGeneral,
-  generateFullCorrections,
+  generateMinimalCorrectionsForWord,
 } from '../src/generateCorrections';
 import {Correction} from '../src/model/EditOperation/Correction';
 import {EditOperation} from '../src/model/EditOperation/EditOperation';
 import {Word} from '../src/model/Word';
-import {
-  Deletion,
-  EmptyOperation,
-  Insertion,
-  Replacement,
-} from '../src/model/EditOperation';
-import {validateCorrections} from '../src/validateCorrections';
-import {Cache} from '../src/Cache';
-import {Grammar} from '../src/model/Grammar';
+import {EmptyOperation} from '../src/model/EditOperation';
 
 describe('generateCorrections', () => {
   test('Correction Biogrammar', () => {
@@ -321,42 +310,3 @@ test('Apple-Banana-Grammar', () => {
   //Expect Insertions left and right
   generateMinimalCorrectionsForWord(word4, grammar, 2);
 });
-function generateMinimalCorrectionsForWord(
-  word: Word,
-  grammar: {
-    rules: Map<string, string[][]>;
-    terminals: string[];
-    rootRule: string;
-  },
-  iterations: number
-) {
-  const lexicon = new Map<string, string>();
-  const exprGrammar = translateGrammar(grammar, lexicon);
-  const cache = new Cache<EditOperation[], boolean>();
-
-  const minAndRemainingCorrections: [Correction[], Correction[]] =
-    generateAllMinimalCorrections(word, grammar, true, iterations);
-  let [minCorrections] = minAndRemainingCorrections;
-  const [, remainingCorrections] = minAndRemainingCorrections;
-  Correction.printCorrections(minCorrections, 'Candidates (p-minimal)');
-
-  minCorrections = validateCorrections(
-    minCorrections,
-    word,
-    exprGrammar,
-    lexicon,
-    cache
-  );
-  Correction.printCorrections(minCorrections, 'Validated (a-minimal)');
-
-  const fullCorrections = generateFullCorrections(
-    remainingCorrections,
-    grammar.terminals,
-    word,
-    lexicon,
-    cache,
-    exprGrammar,
-    iterations
-  );
-  Correction.printCorrections(fullCorrections, 'Including Insertions');
-}
