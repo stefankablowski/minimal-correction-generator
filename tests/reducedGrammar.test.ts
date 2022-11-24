@@ -15,10 +15,11 @@ import {Correction} from '../src/model/EditOperation/Correction';
 import {EditOperation} from '../src/model/EditOperation/EditOperation';
 import {Word} from '../src/model/Word';
 import {EmptyOperation} from '../src/model/EditOperation';
+import {Grammar} from '../src/model/Grammar';
 
 describe('generateCorrections', () => {
   test('Reduced Grammar', () => {
-    const grammar = {
+    const grammar: Grammar = {
       rules: new Map([
         ['hypothesis', [['simple'], ['complex']]],
         ['simple', [['unspecific']]],
@@ -98,6 +99,8 @@ describe('generateCorrections', () => {
     const word = ['Temperature', 'influences', 'enzyme'];
  */
     //Expect Insertions left and right
-    generateMinimalCorrectionsForWord(word, grammar, 2);
+    // generateMinimalCorrectionsForWord(word, grammar, 2);
+
+    console.log(Grammar.toTex(grammar));
   });
 });
