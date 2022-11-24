@@ -2,6 +2,7 @@ import {
   translateGrammar,
   parseAndEncode,
   cfgtool,
+  decodeString,
 } from '../src/translateGrammar';
 import {
   applyOperationsToWord,
@@ -16,264 +17,87 @@ import {Word} from '../src/model/Word';
 import {EmptyOperation} from '../src/model/EditOperation';
 
 describe('generateCorrections', () => {
-  test('Correction Biogrammar', () => {
+  test('Reduced Grammar', () => {
     const grammar = {
       rules: new Map([
-        ['hypothese', [['einfach'], ['komplex']]],
-        ['einfach', [['unspezifisch'], ['spezifisch'], ['konditional']]],
-        ['komplex', [['einfach', 'modal'], ['vergleich']]],
+        ['hypothesis', [['simple'], ['complex']]],
+        ['simple', [['unspecific']]],
+        ['complex', [['simple', 'modal']]],
 
-        [
-          'unspezifisch',
-          [
-            [
-              'der|die|das|den',
-              'unspezvariable',
-              'unspezabhaengigkeit',
-              'der|die|das|den',
-              'unspezvariable',
-            ],
-          ],
-        ],
-        [
-          'spezifisch',
-          [
-            [
-              'der|die|das|den',
-              'unspezvariable',
-              'spezabhaengigkeit',
-              'spezAdjektiv',
-              'bei',
-              'unspezvariable',
-            ],
-            [
-              'bei',
-              'Adjektiv',
-              'unspezvariable',
-              'spezabhaengigkeit',
-              'der|die|das|den',
-              'unspezvariable',
-            ],
-            [
-              'bei',
-              'spezUV',
-              'spezabhaengigkeit',
-              'der|die|das|den',
-              'unspezvariable',
-              'spezAdjektiv',
-            ],
-            [
-              'der|die|das|den',
-              'unspezvariable',
-              'spezabhaengigkeit',
-              'spezAdjektiv',
-              'bei',
-              'spezUV',
-            ],
-          ],
-        ],
-        [
-          'konditional',
-          [
-            [
-              'wenn',
-              'der|die|das|den',
-              'unspezvariable',
-              'AdjektivStar',
-              'spezabhaengigkeit',
-              ', dann',
-              'spezabhaengigkeit',
-              'der|die|das|den',
-              'unspezvariable',
-              'spezAdjektiv',
-            ],
-            [
-              'je',
-              'Adjektiv',
-              'der|die|das|den',
-              'unspezvariable',
-              'spezabhaengigkeit',
-              ', desto',
-              'Adjektiv',
-              'spezabhaengigkeit',
-              'der|die|das|den',
-              'unspezvariable',
-            ],
-          ],
-        ],
-        ['modal', [[', aber nur', 'Wertebereich']]],
-        [
-          'vergleich',
-          [
-            [
-              'Adjektiv',
-              'unspezvariable',
-              'unspezabhaengigkeit',
-              'der|die|das|den',
-              'unspezvariable',
-              'vergleichsOp',
-              'Adjektiv',
-              'unspezvariable',
-            ],
-            [
-              'der|die|das|den',
-              'unspezAV',
-              'spezabhaengigkeit',
-              'bei',
-              'spezUV',
-              'vergleichsOp',
-              'bei',
-              'spezUV',
-            ],
-          ],
-        ],
+        ['unspecific', [['unspezUV', 'unspecificdependency', 'unspezAV']]],
 
-        ['unspezvariable', [['unspezAV'], ['unspezUV']]],
+        ['modal', [[', but only', 'ValueRange']]],
 
         [
           'unspezAV',
           [
-            ['Hefeaktivitaet'],
-            ['Pizzateig'],
-            ['Hefe'],
-            ['Enzyme'],
-            ['Enzymaktivitaet'],
+            ['yeast activity'],
+            ['pizza dough'],
+            ['yeast'],
+            ['enzyme'],
+            ['enzyme activity'],
           ],
         ],
-        ['unspezUV', [['Temperatur'], ['Waerme'], ['Kaelte']]],
-        ['spezUV', [['20 Grad'], ['0 Grad']]],
-        ['unspezabhaengigkeit', [['beeinflusst']]],
-        ['spezabhaengigkeit', [['steigt'], ['fällt'], ['arbeitet']]],
-        ['Adjektiv', [['mehr'], ['weniger'], ['hoeher|e'], ['niedriger|e']]],
-        ['spezAdjektiv ', [['langsamer'], ['schneller']]],
-
-        ['AdjektivStar', [['spezAdjektiv'], ['Adjektiv']]],
-        ['vergleichsOp', [['besser als']]],
+        ['unspezUV', [['Temperature'], ['Heat'], ['Cold']]],
+        ['spezUV', [['20 degrees'], ['0 degrees']]],
+        ['unspecificdependency', [['influences']]],
         [
-          'Wertebereich',
-          [['von 20 Grad'], ['ab 20 Grad'], ['von 20 Grad bis 40 Grad']],
+          'ValueRange',
+          [
+            ['up to 20 degrees'],
+            ['from 20 degrees'],
+            ['between 20 degrees and 40 degrees'],
+          ],
         ],
       ]),
       terminals: [
-        'von 20 Grad',
-        'ab 20 Grad',
-        'von 20 Grad bis 40 Grad',
-        'besser als',
-        'langsamer',
-        'schneller',
-        'niedriger|e',
-        'hoeher|e',
-        'mehr',
-        'weniger',
-        'hoeher|e',
-        'niedriger|e',
-        'steigt',
-        'fällt',
-        'arbeitet',
-        'beeinflusst',
-        '0 Grad',
-        '20 Grad',
-        '0 Grad',
-        'Hefeaktivitaet',
-        'Pizzateig',
-        'Hefe',
-        'Enzyme',
-        'Enzymaktivitaet',
-        'bei',
-        'der|die|das|den',
-        'je',
-        ', dann',
-        ', desto',
-        'Temperatur',
-        'Waerme',
-        'Kaelte',
-        ', aber nur',
+        'yeast activity',
+        'pizza dough',
+        'yeast',
+        'enzyme',
+        'enzyme activity',
+        'Temperature',
+        'Heat',
+        'Cold',
+        'up to 20 degrees',
+        'from 20 degrees',
+        'between 20 degrees and 40 degrees',
+        'influences',
+        '0 degrees',
+        '20 degrees',
+        ', but only',
       ],
-      rootRule: 'S',
+      rootRule: 'hypothesis',
     };
+
     const lexicon = new Map<string, string>();
     const exprGrammar = translateGrammar(grammar, lexicon);
-
-    // Die Wärme beeinflusst die Hefe
-    const sentence1 = [
-      'der|die|das|den',
-      'Waerme',
-      'beeinflusst',
-      'der|die|das|den',
-      'Hefe',
-    ];
-
-    // Höhere Wärme beeinflust die Hefeaktivität besser als weniger Wärme
-    const sentence2 = [
-      'hoeher|e',
-      'Waerme',
-      'beeinflusst',
-      'der|die|das|den',
-      'Hefeaktivitaet',
-      'besser als',
-      'weniger',
-      'Waerme',
-    ];
-    expect(
-      parseAndEncode(lexicon, exprGrammar, sentence1).length > 0
-    ).toBeTruthy();
-    expect(
-      parseAndEncode(lexicon, exprGrammar, sentence2).length > 0
-    ).toBeTruthy();
-
-    exprGrammar;
     const generatorFactory = cfgtool.generator;
     const generator = generatorFactory(exprGrammar);
     for (let index = 0; index < 30; index++) {
       const generatedString = generator(index);
       if (generatedString) {
-        // console.log(decodeString(generatedString, lexicon).join(','));
+        console.log(
+          decodeString(generatedString, lexicon)
+            .map(el => `"${el}"`)
+            .join(',')
+        );
       }
     }
+    const word = ['enzyme', 'influences', 'yeast'];
+    /*
+    const word = ['enzyme', 'yeast'];
+    const word = ['enzyme'];
+    const word = ['Temperature', 'enzyme'];
+    const word = ['Temperature', 'influences', 'enzyme'];
 
-    const sentence3 = [
-      'der|die|das|den',
-      'Waerme',
-      'beeinflusst',
-      'der|die|das|den',
-      'Hefeaktivitaet',
-      ', aber nur',
-      'von 20 Grad bis 40 Grad',
-    ];
-    const sentence3faulty = [
-      'der|die|das|den',
-      'Waerme',
-      'beeinflusst',
-      'der|die|das|den',
-      'Hefeaktivitaet',
-      'von 20 Grad bis 40 Grad',
-    ];
-
-    // generateMinimalCorrectionsForWord(sentence3faulty, grammar, 2);
-    // generateMinimalCorrectionsForWord(sentence3faulty, grammar, 2);
-    // generateMinimalCorrectionsForWord(sentence3faulty, grammar, 3);
+    const word = ['enzyme', 'influences', 'yeast'];
+    const word = ['enzyme', 'influences'];
+    const word = ['Temperature', 'enzyme', 'influences'];
+    const word = ['Temperature', 'influences', 'enzyme', 'influences'];
+    const word = ['Temperature', 'influences', 'enzyme'];
+ */
+    //Expect Insertions left and right
+    generateMinimalCorrectionsForWord(word, grammar, 2);
   });
-});
-test('Reduced Grammar', () => {
-  const grammar = {
-    rules: new Map([
-      ['S', [['E']]],
-      ['E', [['E', '+', 'E'], ['Apple'], ['Banana']]],
-    ]),
-    terminals: ['Banana', 'Apple', '+'],
-    rootRule: 'S',
-  };
-
-  const word = ['Banana', '+', 'Apple'];
-  const operations: EditOperation[] = generateOperationsForWordGeneral(
-    word,
-    [false, false, false],
-    grammar.terminals
-  );
-
-  const word2 = ['Banana', '+', '+', 'Apple'];
-  const word3 = ['Banana', 'Apple', 'Banana'];
-  const word4 = ['+'];
-  //Expect Insertions left and right
-  generateMinimalCorrectionsForWord(word4, grammar, 2);
 });
