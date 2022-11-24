@@ -79,6 +79,9 @@ export abstract class EditOperation implements Comparable<EditOperation> {
     ) {
       return [new Insertion(op2.insertSymbol, op2.index)];
     }
+    if (op1.index === op2.index && op1.isDeletion() && op2.isInsertion()) {
+      return [new Replacement(op1.deleteSymbol, op2.insertSymbol, op1.index)];
+    }
     /* Extended Simplifying */
     // (ii)
     if (
