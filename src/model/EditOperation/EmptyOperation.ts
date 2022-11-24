@@ -13,4 +13,8 @@ export class EmptyOperation extends EditOperation {
   toString(): string {
     return '⍷';
   }
+
+  toTex(): string {
+    return `\\epsilon`;
+  }
 }

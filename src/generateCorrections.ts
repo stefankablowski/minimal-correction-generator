@@ -35,7 +35,8 @@ export function generateMinimalCorrectionsForWord(
     generateAllMinimalCorrections(word, grammar, true, iterations);
   let [minCorrections] = minAndRemainingCorrections;
   const [, remainingCorrections] = minAndRemainingCorrections;
-  Correction.printCorrections(minCorrections, 'Candidates (p-minimal)');
+  // Correction.printCorrections(minCorrections, 'Candidates (p-minimal)');
+  Correction.texCorrections(minCorrections, 'Candidates (p-minimal)');
 
   minCorrections = validateCorrections(
     minCorrections,
@@ -44,7 +45,8 @@ export function generateMinimalCorrectionsForWord(
     lexicon,
     cache
   );
-  Correction.printCorrections(minCorrections, 'Validated (a-minimal)');
+  // Correction.printCorrections(minCorrections, 'Validated (a-minimal)');
+  Correction.texCorrections(minCorrections, 'Validated (a-minimal)');
 
   const fullCorrections = generateFullCorrections(
     remainingCorrections,
@@ -55,7 +57,8 @@ export function generateMinimalCorrectionsForWord(
     exprGrammar,
     iterations
   );
-  Correction.printCorrections(fullCorrections, 'Including Insertions');
+  // Correction.printCorrections(fullCorrections, 'Including Insertions');
+  Correction.texCorrections(fullCorrections, 'Including Insertions');
 }
 
 export function generateMinimalCorrectionsForOneWord(

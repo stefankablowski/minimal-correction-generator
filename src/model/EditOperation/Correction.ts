@@ -135,6 +135,10 @@ export class Correction implements Comparable<Correction> {
     return this.operations.join();
   }
 
+  public toTex(): string {
+    return `(${this.operations.map(operation => operation.toTex()).join()})`;
+  }
+
   /**
    * @returns true if and only if the correction contains an element of type EmptyOperation
    */
@@ -156,6 +160,14 @@ export class Correction implements Comparable<Correction> {
     // console.log(
     //   `${JSON.stringify(c.operations)}, resultingword: ${c.resultingWord}`
     // )
+  }
+
+  static texCorrections(minCorrections: Correction[], message = '') {
+    const str = minCorrections
+      .map(correction => correction.toTex())
+      .join('\\\\ \n');
+
+    log.debug('\n - '.concat(message).concat('\n').concat(str));
   }
 
   static simplifiable(operations: EditOperation[]) {

@@ -12,6 +12,7 @@ export abstract class EditOperation implements Comparable<EditOperation> {
   index: number;
   abstract apply(word: Word): Word;
   abstract toString(): string;
+  abstract toTex(): string;
 
   static print(
     firstSymbol: string,

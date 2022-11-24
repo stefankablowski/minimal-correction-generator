@@ -19,4 +19,8 @@ export class Insertion extends EditOperation {
   toString(): string {
     return EditOperation.print(this.insertSymbol, '⬆', this.index);
   }
+
+  toTex() {
+    return `\\opinsert{${this.insertSymbol}}{${this.index}}`;
+  }
 }

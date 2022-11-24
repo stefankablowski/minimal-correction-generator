@@ -27,4 +27,8 @@ export class Replacement extends EditOperation {
       this.insertSymbol
     );
   }
+
+  toTex() {
+    return `\\opreplace{${this.deleteSymbol}}{${this.index}}{${this.insertSymbol}}`;
+  }
 }

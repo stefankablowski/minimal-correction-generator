@@ -24,4 +24,8 @@ export class Deletion extends EditOperation {
   toString(): string {
     return EditOperation.print(this.deleteSymbol, '⬇', this.index);
   }
+
+  toTex() {
+    return `\\opdelete{${this.deleteSymbol}}{${this.index}}`;
+  }
 }
