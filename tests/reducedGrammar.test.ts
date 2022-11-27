@@ -22,28 +22,25 @@ describe('generateCorrections', () => {
     const grammar: Grammar = {
       rules: new Map([
         ['hypothesis', [['simple'], ['complex']]],
-        ['simple', [['unspecific']]],
-        ['complex', [['simple', 'modal']]],
-
-        ['unspecific', [['unspezUV', 'unspecificdependency', 'unspezAV']]],
-
-        ['modal', [[', but only', 'ValueRange']]],
-
         [
-          'unspezAV',
+          'simple',
+          [['independentVariable', 'influences', 'dependentVariable']],
+        ],
+        ['complex', [['simple', 'modal']]],
+        ['modal', [[', but only', 'valueRange']]],
+        ['independentVariable', [['Temperature'], ['Heat'], ['Cold']]],
+        [
+          'dependentVariable',
           [
             ['yeast activity'],
-            ['pizza dough'],
-            ['yeast'],
-            ['enzyme'],
+            ['the pizza dough'],
+            ['the yeast'],
+            ['the enzyme'],
             ['enzyme activity'],
           ],
         ],
-        ['unspezUV', [['Temperature'], ['Heat'], ['Cold']]],
-        ['spezUV', [['20 degrees'], ['0 degrees']]],
-        ['unspecificdependency', [['influences']]],
         [
-          'ValueRange',
+          'valueRange',
           [
             ['up to 20 degrees'],
             ['from 20 degrees'],
@@ -53,9 +50,9 @@ describe('generateCorrections', () => {
       ]),
       terminals: [
         'yeast activity',
-        'pizza dough',
-        'yeast',
-        'enzyme',
+        'the pizza dough',
+        'the yeast',
+        'the enzyme',
         'enzyme activity',
         'Temperature',
         'Heat',
@@ -85,18 +82,18 @@ describe('generateCorrections', () => {
         );
       }
     }
-    const word = ['enzyme', 'influences', 'yeast'];
+    const word = ['the enzyme', 'influences', 'the yeast'];
     /*
-    const word = ['enzyme', 'yeast'];
-    const word = ['enzyme'];
-    const word = ['Temperature', 'enzyme'];
-    const word = ['Temperature', 'influences', 'enzyme'];
+    const word = ['the enzyme', 'the yeast'];
+    const word = ['the enzyme'];
+    const word = ['Temperature', 'the enzyme'];
+    const word = ['Temperature', 'influences', 'the enzyme'];
 
-    const word = ['enzyme', 'influences', 'yeast'];
-    const word = ['enzyme', 'influences'];
-    const word = ['Temperature', 'enzyme', 'influences'];
-    const word = ['Temperature', 'influences', 'enzyme', 'influences'];
-    const word = ['Temperature', 'influences', 'enzyme'];
+    const word = ['the enzyme', 'influences', 'the yeast'];
+    const word = ['the enzyme', 'influences'];
+    const word = ['Temperature', 'the enzyme', 'influences'];
+    const word = ['Temperature', 'influences', 'the enzyme', 'influences'];
+    const word = ['Temperature', 'influences', 'the enzyme'];
  */
     //Expect Insertions left and right
     // generateMinimalCorrectionsForWord(word, grammar, 2);
