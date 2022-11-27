@@ -11,20 +11,25 @@ export class Grammar {
         Array.from(grammar.rules)
           .map(([LHS, RHS]) => {
             return `\\textit{${LHS}} & $\\rightarrow$ & \\textit{${printRule(
-              RHS
+              RHS,
+              grammar.terminals
             )}} \\\\ \n`;
           })
           .join('')
       )
-      .concat(`\\end{tblr}`);
+      .concat('\\end{tblr}');
 
     return result;
   }
 }
 
-function printRule(RHSarray: string[][]) {
+function printRule(RHSarray: string[][], terminals: string[]) {
   const innerRulesFormatted = RHSarray.map(RHSsingle =>
-    RHSsingle.map(variable => `(${variable})`).join('\\ ')
+    RHSsingle.map(variable => {
+      return terminals.includes(variable)
+        ? `\\bsq{${variable}}`
+        : `\\textlangle ${variable}\\textrangle`;
+    }).join('\\ ')
   );
   return innerRulesFormatted.join('\\ $\\vert$\\ ');
 }
