@@ -17,6 +17,8 @@ import {minimizable} from './minimize';
 import {partition} from './util';
 import {validateCorrections} from './validateCorrections';
 import {Cache} from './Cache';
+import {texWord} from './model/Word';
+import {log} from './log';
 
 export function generateMinimalCorrectionsForWord(
   word: Word,
@@ -27,6 +29,7 @@ export function generateMinimalCorrectionsForWord(
   },
   iterations: number
 ) {
+  log.debug(`\n ${texWord(word)}`);
   const lexicon = new Map<string, string>();
   const exprGrammar = translateGrammar(grammar, lexicon);
   const cache = new Cache<EditOperation[], boolean>();
@@ -164,7 +167,8 @@ export function generateAllMinimalCorrections(
       return minimizable(corr);
     }
   );
-  Correction.printCorrections(minimizableCorrections, 'Minimizable are');
+  // Correction.printCorrections(minimizableCorrections, 'Minimizable are');
+  Correction.texCorrections(minimizableCorrections, 'Minimizable are');
 
   return [nonMinimizableCorrections, allRemainingPrefixes];
 }
