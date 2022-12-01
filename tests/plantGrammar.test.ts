@@ -75,7 +75,7 @@ describe('Plant Grammar', () => {
   });
 
   test('tex grammar', () => {
-    console.log(Grammar.toTex(grammar));
+    // console.log(Grammar.toTex(grammar));
   });
 
   test('Leaf color influences synthesis rate', () => {
@@ -99,7 +99,7 @@ describe('Plant Grammar', () => {
   test('Light influences', () => {
     const word = ['Light', 'influences'];
 
-    generateMinimalCorrectionsForWord(word, grammar, 3); //1000 ms
+    // generateMinimalCorrectionsForWord(word, grammar, 3); //1000 ms
     // generateMinimalCorrectionsForWord(word, grammar, 1); //50 ms
   });
 
@@ -112,12 +112,12 @@ describe('Plant Grammar', () => {
   test('Light influences Wavelength , but only', () => {
     const word = ['Light', 'influences', 'Wavelength', ', but only'];
 
-    generateMinimalCorrectionsForWord(word, grammar, 3);
+    // generateMinimalCorrectionsForWord(word, grammar, 3);
   });
 
   test('Light Wavelength influences plant growth', () => {
     const word = ['Light', 'Wavelength', 'influences', 'plant growth'];
 
-    generateMinimalCorrectionsForWord(word, grammar, 2);
+    // generateMinimalCorrectionsForWord(word, grammar, 2);
   });
 });

@@ -308,5 +308,5 @@ test('Apple-Banana-Grammar', () => {
   const word3 = ['Banana', 'Apple', 'Banana'];
   const word4 = ['+'];
   //Expect Insertions left and right
-  generateMinimalCorrectionsForWord(word4, grammar, 2);
+  // generateMinimalCorrectionsForWord(word4, grammar, 2);
 });

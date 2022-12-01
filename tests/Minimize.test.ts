@@ -100,3 +100,19 @@ test('Minimize Deletion, Replacement', () => {
   );
   expect(minimizable(c2)).toBe(true);
 });
+
+test('Example', () => {
+  const c1 = new Correction(
+    [
+      new Deletion('a', 0),
+      new Deletion('a', 1),
+      new Replacement('b', 'a', 1),
+      new Replacement('c', 'd', 2),
+    ],
+    2
+  );
+
+  const minimized = minimize(c1);
+  const tex = minimized?.toTex();
+  // console.log(tex);
+});

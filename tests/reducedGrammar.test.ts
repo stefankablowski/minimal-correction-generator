@@ -18,7 +18,7 @@ import {EmptyOperation} from '../src/model/EditOperation';
 import {Grammar} from '../src/model/Grammar';
 
 describe('generateCorrections', () => {
-  test('Reduced Grammar', () => {
+  test.skip('Reduced Grammar', () => {
     const grammar: Grammar = {
       rules: new Map([
         ['hypothesis', [['simple'], ['complex']]],
@@ -98,6 +98,6 @@ describe('generateCorrections', () => {
     //Expect Insertions left and right
     // generateMinimalCorrectionsForWord(word, grammar, 2);
 
-    console.log(Grammar.toTex(grammar));
+    // console.log(Grammar.toTex(grammar));
   });
 });

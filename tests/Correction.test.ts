@@ -111,6 +111,6 @@ describe('Corrections', () => {
       new Deletion('n', 1),
     ];
     const normalized = Correction.normalize(operations);
-    Correction.printCorrections([normalized]);
+    // Correction.printCorrections([normalized]);
   });
 });

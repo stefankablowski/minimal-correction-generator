@@ -86,7 +86,7 @@ export function encodeTerminals(
 let id = 0;
 export function makeid() {
   if (id > 63) {
-    throw new RangeError('Cannot Encode more than 63 Terminals');
+    throw new RangeError('Cannot Encode Terminal');
   }
   const characters =
     'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
